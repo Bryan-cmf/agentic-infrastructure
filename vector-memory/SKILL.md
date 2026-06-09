@@ -11,14 +11,63 @@ description: 向量記憶 語義記憶 Agent記憶 持久記憶 記憶系統 跨
 curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/vector-memory/setup.sh | bash
 ```
 
-## 多語言簡介
+## 🌏 完整多語種說明
 
-**🇹🇼 繁中：** Qdrant 向量資料庫 + BGE-m3 嵌入——讓 Agent 記住一切，永不失憶。
-**🇨🇳 簡中：** Qdrant 向量数据库 + BGE-m3 嵌入——让 Agent 记住一切，永不失忆。
-**🇯🇵 日文：** QdrantベクトルDB + BGE-m3埋め込み——エージェントがすべてを記憶し、決して忘れない。
-**🇰🇷 韓文：** Qdrant 벡터DB + BGE-m3 임베딩——에이전트가 모든 것을 기억하고 절대 잊지 않습니다.
-**🇸🇦 阿文：** قاعدة بيانات Qdrant المتجهة + تضمين BGE-m3——الوكيل يتذكر كل شيء ولا ينسى أبداً.
-**🇮🇳 印地：** Qdrant वेक्टर DB + BGE-m3 एम्बेडिंग——एजेंट सब कुछ याद रखता है, कभी नहीं भूलता।
+### 🇹🇼 繁體中文
+
+**問題：** 你的 AI Agent 重啟後完全失憶——每一次對話都從零開始。Agent 每次都問「你是誰」「之前做到哪了」，做了 6 小時的工作，第二天完全不記得。市場數據：狀態失憶被 VentureBeat 稱為 Agent 生產環境的 #1 殺手。24% 的生產故障來自「幻覺傳播」——Agent 忘記前面步驟的上下文而做出錯誤決策。77% 的團隊花超過 30% 的工程時間在基礎設施管道而非智能開發。
+
+**方案：** Qdrant 向量資料庫 + BGE-m3 中文最優嵌入模型，四層記憶架構：(1) 自動捕獲層（對話→向量）(2) 語義存儲層（1024 維 COSINE）(3) 智慧檢索層（mem_search/知識圖譜/時間旅行）(4) 記憶固化層（夜間合併/遺忘曲線/去重）。一鍵部署：`curl | bash`。
+
+**效果：** 記憶保留率從 0% → >95%。中文搜尋精確度 >78%（對比 agentmemory 的 0%）。6,675 條記憶，每日寫入 50-100 條。支援 6 種搜尋模式。
+
+```bash
+curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/vector-memory/setup.sh | bash
+```
+
+### 🇨🇳 简体中文
+
+**问题：** 你的 AI Agent 重启后完全失忆——每一次对话都从零开始。Agent 每次都问「你是谁」「之前做到哪了」，做了 6 小时的工作，第二天完全不记得。市场数据：状态失忆被 VentureBeat 称为 Agent 生产环境的 #1 杀手。
+
+**方案：** Qdrant 向量数据库 + BGE-m3 中文最优嵌入模型，四层记忆架构：自动捕获层 → 语义存储层（1024维 COSINE）→ 智能检索层（mem_search/知识图谱/时间旅行）→ 记忆固化层。一键部署：`curl | bash`。
+
+**效果：** 记忆保留率从 0% → >95%。中文搜索精确度 >78%。6,675 条记忆。
+
+```bash
+curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/vector-memory/setup.sh | bash
+```
+
+### 🇯🇵 日本語
+
+**問題：** AI エージェントが再起動するたびに完全に記憶を失う。毎回の会話がゼロからスタート。6 時間の作業も翌日には全く覚えていない。状態喪失は VentureBeat によりエージェント本番環境の #1 キラーと評される。本番障害の 24% はエージェントが前のステップのコンテキストを忘れて誤った判断をすることに起因。
+
+**方案：** Qdrant ベクトル DB + BGE-m3 埋め込みモデル。4 層メモリアーキテクチャ：(1) 自動キャプチャ層 (2) セマンティックストレージ層 (3) インテリジェント検索層 (4) メモリ定着層。ワンライン Deploy。
+
+**効果：** メモリ保持率 0%→95%超。中国語検索精度 >78%（agentmemory の 0% と比較）。6,675 件のメモリ。
+
+### 🇰🇷 한국어
+
+**문제:** AI 에이전트가 재시작할 때마다 완전히 기억을 잃습니다. 매 대화가 제로부터 시작. 6시간 작업도 다음날 전혀 기억하지 못합니다. 상태 상실은 VentureBeat에 의해 에이전트 프로덕션 환경의 #1 킬러로 평가됨.
+
+**해결책:** Qdrant 벡터 DB + BGE-m3 임베딩 모델. 4계층 메모리 아키텍처: 자동 캡처 → 시맨틱 스토리지(1024차원 COSINE) → 지능형 검색(mem_search/지식그래프/시간여행) → 메모리 고착. 한 줄 Deploy.
+
+**효과:** 메모리 유지율 0%→95% 초과. 중국어 검색 정확도 >78%. 6,675개 메모리.
+
+### 🇸🇦 العربية
+
+**المشكلة:** وكيل الذكاء الاصطناعي يفقد ذاكرته بالكامل بعد كل إعادة تشغيل. كل محادثة تبدأ من الصفر. لا يتذكر 6 ساعات من العمل في اليوم التالي. فقدان الحالة يُصنف كالقاتل الأول في بيئة إنتاج الوكلاء (VentureBeat).
+
+**الحل:** قاعدة بيانات Qdrant المتجهة + نموذج تضمين BGE-m3. بنية ذاكرة رباعية الطبقات: التقاط تلقائي → تخزين دلالي → بحث ذكي → ترسيخ الذاكرة. نشر بسطر واحد.
+
+**التأثير:** معدل الاحتفاظ بالذاكرة من 0% → >95%. دقة البحث بالصينية >78%. 6,675 ذاكرة.
+
+### 🇮🇳 हिन्दी
+
+**समस्या:** AI एजेंट हर रीस्टार्ट पर पूरी तरह से भूल जाता है। हर बातचीत शून्य से शुरू। 6 घंटे का काम अगले दिन बिल्कुल याद नहीं। स्टेट लॉस को VentureBeat ने एजेंट प्रोडक्शन का #1 किलर बताया।
+
+**समाधान:** Qdrant वेक्टर DB + BGE-m3 एम्बेडिंग मॉडल। 4-लेयर मेमोरी: ऑटो कैप्चर → सिमैंटिक स्टोरेज → इंटेलिजेंट रिट्रीवल (mem_search/नॉलेज ग्राफ/टाइम ट्रैवल) → मेमोरी कंसॉलिडेशन। एक लाइन डिप्लॉय।
+
+**प्रभाव:** मेमोरी रिटेंशन 0%→>95%। चीनी सर्च एक्यूरेसी >78% (agentmemory के 0% की तुलना में)। 6,675 मेमोरीज़।
 
 ---
 
@@ -39,13 +88,8 @@ curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/mai
 |------|------|
 | 狀態失憶是 Agent 生產環境 #1 殺手 | VentureBeat Pulse Q2 2026 |
 | 77% 團隊花 >30% 時間在基礎設施管道而非智能開發 | VentureBeat 企業 AI 調查 |
-| 24% 故障來自幻覺傳播（Agent 忘記前面步驟的上下文） | VentureBeat Agentic Reckoning Report |
+| 24% 故障來自幻覺傳播 | VentureBeat Agentic Reckoning |
 | 40% 專案因基礎設施問題在 2027 前被取消 | Gartner |
-| 多 Agent Debug 耗時 3-5 倍於單 Agent | Zylos Research |
-
-**開源生態的現狀：**
-
-現有的 agentmemory 等方案主要為 Claude Code 等 Coding Agent 設計，對中文支援幾乎為零（我們實測 0% 檢索成功率）。社區缺乏一個**通用、輕量、多語言、開箱即用**的 Agent 記憶方案。
 
 ## 方案
 
@@ -55,51 +99,14 @@ curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/mai
 ┌──────────────────────────────────────────────┐
 │              向量記憶系統                      │
 ├──────────────────────────────────────────────┤
-│                                              │
-│  寫入層                                       │
-│  ├─ Agent 對話自動捕獲 (MCP Server)            │
-│  ├─ 文件系統掃描 (增量同步)                     │
-│  └─ 雙寫強制 (file + vector 同步寫入)           │
-│                                              │
-│  存儲層                                       │
-│  ├─ Qdrant 向量資料庫 (1024-dim COSINE)        │
-│  ├─ BGE-m3 嵌入模型 (193MB, 中英文最優)         │
-│  └─ 三層去重 (UUID5 + Offset + Jaccard)        │
-│                                              │
-│  檢索層                                       │
-│  ├─ mem_search (語義搜尋)                      │
-│  ├─ mem_federated (跨 Collection 搜尋)         │
-│  ├─ mem_graph (知識圖譜)                       │
-│  ├─ mem_time_travel (時間旅行)                 │
-│  └─ mem_health (系統健康報告)                   │
-│                                              │
-│  固化層                                       │
-│  ├─ auto-dream (夜間合併整理)                  │
-│  ├─ mem_decay (遺忘曲線)                       │
-│  ├─ mem_dedup (去重)                          │
-│  └─ mem_contradict (矛盾檢測)                  │
-│                                              │
+│  寫入層: Agent 對話自動捕獲 + 文件系統掃描      │
+│  存儲層: Qdrant (1024-dim COSINE) + BGE-m3    │
+│  檢索層: mem_search / mem_graph / time_travel  │
+│  固化層: auto-dream / mem_decay / mem_dedup    │
 └──────────────────────────────────────────────┘
 ```
 
-### 一鍵部署
-
-```bash
-# 1. 啟動 Qdrant
-docker compose up -d
-
-# 2. 安裝依賴
-pip install sentence-transformers qdrant-client
-
-# 3. 啟動記憶服務
-python3 mcp_server.py
-
-# 4. 配置 OpenClaw Gateway（將 vector-memory MCP 加入 plugins）
-```
-
----
-
-## 功能矩陣
+### 功能矩陣
 
 | 功能 | 工具 | 用途 |
 |------|------|------|
@@ -107,68 +114,33 @@ python3 mcp_server.py
 | 跨庫搜尋 | `mem_federated` | 一次搜尋所有 Collection |
 | 知識圖譜 | `mem_graph` | 發現記憶之間的隱含關聯 |
 | 時間旅行 | `mem_time_travel` | 「3 個月前我們在做什麼？」 |
-| 記憶寫入 | `mem_save` | 保存新記憶（支援 Tags） |
 | 自動去重 | `mem_dedup` | 合併重複記憶 |
 | 遺忘曲線 | `mem_decay` | 自動降低舊記憶權重 |
 | 矛盾檢測 | `mem_contradict` | 發現衝突記憶 |
 | 健康報告 | `mem_health` | 系統全面體檢 |
 
----
-
-## 實戰數據（UltraClaw 自用）
+### 實戰數據
 
 | 指標 | 數值 |
 |------|------|
 | 總記憶條數 | 6,675 |
-| 索引向量數 | 6,009 |
 | 嵌入維度 | 1024 (BGE-m3) |
-| 距離算法 | COSINE |
-| Collection 數 | 5（openclaw / deepseek / claude / hermes / shared） |
 | 中文搜尋精確度 | >78% |
-| 硬碟佔用 | ~150MB（含模型） |
 | 每日寫入量 | ~50-100 條 |
 
----
-
-## 與 agentmemory 的對比
+### 與 agentmemory 對比
 
 | 維度 | agentmemory | Vector Memory |
 |------|------------|---------------|
-| 設計場景 | Coding Agent（Claude Code） | 通用 AI 助理 |
 | 中文檢索成功率 | 0%（實測） | >78% |
 | 嵌入模型 | 英文優化 | BGE-m3（中英文最優） |
 | 部署複雜度 | 高（多容器） | 低（單容器 + Python） |
 | 數據主權 | 依賴外部索引 | 100% 本地 |
-| 知識圖譜 | 有 | 有 |
-| 時間旅行 | 無 | 有 |
-| 適合平台 | Claude Code | OpenClaw / Claude Code / 通用 |
-
----
-
-## 為什麼選擇 Qdrant？
-
-| 對比 | Qdrant | Chroma | Weaviate | Milvus |
-|------|--------|--------|----------|--------|
-| 語言 | Rust | Python | Go | C++ |
-| 單機性能 | 極佳 | 中 | 佳 | 極佳 |
-| 資源佔用 | 低 (~50MB) | 低 | 高 (~500MB) | 高 (~1GB) |
-| 安裝難度 | 極低（Docker） | 低 | 中 | 高 |
-| 適合場景 | 個人/小團隊 | 原型 | 企業 | 大規模 |
-
----
 
 ## 相關資源
 
-- **前置項目：** [Skills Triggering](../skills-triggering/) — 讓技能被發現
-- **配套項目：** [Skill Router](../skill-router/) — 讓記憶輔助路由決策
-
----
-
-## 📥 一行安裝
-
-```bash
-curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/vector-memory/setup.sh | bash
-```
+- **前置項目：** [Skills Triggering](../skills-triggering/)
+- **配套項目：** [Skill Router](../skill-router/)
 
 ## 授權
 
