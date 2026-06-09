@@ -16,6 +16,12 @@ mkdir -p skills/skill-reporting && curl -sSL https://raw.githubusercontent.com/B
 
 # ④ Vector Memory — 向量記憶持久化（含 Qdrant + BGE-m3 一鍵部署）
 curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/vector-memory/setup.sh | bash
+
+# ⑤ Agent Evolver — 核心文件自我進化
+mkdir -p skills/agent-evolver && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/agent-evolver/SKILL.md -o skills/agent-evolver/SKILL.md
+
+# ⑥ Skill Curator — 技能全生命週期策展
+mkdir -p skills/skill-curator && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skill-curator/SKILL.md -o skills/skill-curator/SKILL.md
 ```
 
 ## 📋 全部一鍵安裝 · Install All
@@ -23,12 +29,14 @@ curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/mai
 把這段話發給任何 AI Agent 即可：
 
 ```
-請安裝 Agentic Infrastructure 四件套：
+請安裝 Agentic Infrastructure 六件套：
 
 mkdir -p skills/skills-triggering && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skills-triggering/SKILL.md -o skills/skills-triggering/SKILL.md
 mkdir -p skills/skill-router && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skill-router/SKILL.md -o skills/skill-router/SKILL.md
 mkdir -p skills/skill-reporting && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skill-reporting/SKILL.md -o skills/skill-reporting/SKILL.md
 curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/vector-memory/setup.sh | bash
+mkdir -p skills/agent-evolver && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/agent-evolver/SKILL.md -o skills/agent-evolver/SKILL.md
+mkdir -p skills/skill-curator && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skill-curator/SKILL.md -o skills/skill-curator/SKILL.md
 ```
 
 ---
@@ -184,6 +192,14 @@ AI 에이전트에 수백 개의 스킬이 있는데 찾을 수 없다면? 비�
     ▼
 🧠 Vector Memory（基礎層 / Foundation）
     │  讓 Agent 記住一切
+    │
+    ▼
+🎨 Skill Curator（維護層 / Maintenance）
+    │  讓技能保持健康
+    │
+    ▼
+🧬 Agent Evolver（進化層 / Evolution）
+    │  讓 Agent 與你一起成長
 ```
 
 ---
