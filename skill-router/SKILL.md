@@ -1,9 +1,26 @@
 ---
 name: skill-router
-description: 技能路由器 任務匹配 技能推薦 任務路由 類別階段矩陣 用咩技能 咩技能 哪個技能 Skill router — class × phase matrix for matching any task to the right skills. Use when Agent has many skills but doesn't know which to invoke, when tasks get mismatched to wrong skills, or when skill discovery rate is low.
+description: 技能路由器 任務匹配 技能推薦 任務路由 類別階段矩陣 用咩技能 スキルルーター タスクマッチング 스킬라우터 작업매칭 Skill router — class × phase matrix for matching any task to the right skills.
 ---
 
 # 🔀 Skill Router — 任何任務，自動匹配正確技能
+
+## 📥 一行安裝
+
+```bash
+mkdir -p skills/skill-router && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skill-router/SKILL.md -o skills/skill-router/SKILL.md
+```
+
+## 多語言簡介
+
+**🇹🇼 繁中：** 任何任務進來，自動匹配正確的技能組合。
+**🇨🇳 簡中：** 任何任务进来，自动匹配正确的技能组合。
+**🇯🇵 日文：** どんなタスクも、正しいスキルの組み合わせに自動マッチング。
+**🇰🇷 韓文：** 모든 작업을 올바른 스킬 조합에 자동 매칭합니다.
+**🇸🇦 阿文：** أي مهمة تدخل، يتم مطابقتها تلقائياً مع مجموعة المهارات الصحيحة.
+**🇮🇳 印地：** कोई भी कार्य आए, स्वचालित रूप से सही स्किल्स से मैच हो जाता है।
+
+---
 
 ## 痛點
 
@@ -131,6 +148,12 @@ cp SKILL.md ~/.openclaw/workspace/skills/skill-router/
 - **配套項目：** [Vector Memory](../vector-memory/) — 讓 Agent 記住路由決策
 
 ---
+
+## 📥 一行安裝
+
+```bash
+mkdir -p skills/skill-router && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skill-router/SKILL.md -o skills/skill-router/SKILL.md
+```
 
 ## 授權
 

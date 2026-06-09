@@ -1,9 +1,26 @@
 ---
 name: skills-triggering
-description: 技能觸發 多語言觸發 技能可見性 技能匹配 技能發現 技能關鍵詞 Skills triggering — solve the "invisible skill" problem for non-English AI agent users. Use when skills aren't being matched to user requests, when non-English users can't trigger skills, or when skill discovery rate is low.
+description: 技能觸發 多語言觸發 技能可見性 技能匹配 技能發現 技能關鍵詞 スキルトリガー 多言語対応 스킬트리거 다국어지원 Skills triggering — solve the "invisible skill" problem for non-English AI agent users.
 ---
 
 # 🌐 Skills Triggering — 讓每個技能對所有語言可見
+
+## 📥 一行安裝
+
+```bash
+mkdir -p skills/skills-triggering && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skills-triggering/SKILL.md -o skills/skills-triggering/SKILL.md
+```
+
+## 多語言簡介
+
+**🇹🇼 繁中：** 讓你的 AI Agent 技能對所有語言的使用者可見——不只是英文。
+**🇨🇳 簡中：** 让你的 AI Agent 技能对所有语言的用户可见——不只是英文。
+**🇯🇵 日文：** AIエージェントのスキルをすべての言語のユーザーに見えるようにする。
+**🇰🇷 韓文：** AI 에이전트 스킬을 모든 언어 사용자에게 보이게 합니다.
+**🇸🇦 阿文：** اجعل مهارات وكيل الذكاء الاصطناعي مرئية للمستخدمين بجميع اللغات.
+**🇮🇳 印地：** अपने AI एजेंट स्किल्स को सभी भाषाओं के उपयोगकर्ताओं के लिए दृश्यमान बनाएं।
+
+---
 
 ## 痛點
 
@@ -137,6 +154,12 @@ python3 skills-triggering.py --skills-dir ~/.openclaw/workspace/skills
 - **配套項目：** [Vector Memory](../vector-memory/) — 基礎層：讓 Agent 記住一切
 
 ---
+
+## 📥 一行安裝
+
+```bash
+mkdir -p skills/skills-triggering && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skills-triggering/SKILL.md -o skills/skills-triggering/SKILL.md
+```
 
 ## 授權
 

@@ -1,9 +1,26 @@
 ---
 name: vector-memory
-description: 向量記憶 語義記憶 Agent記憶 持久記憶 記憶系統 跨Session記憶 Qdrant記憶 Vector memory — persistent semantic memory for AI agents. Use when agents forget everything after restart, when cross-session context is lost, or when you need semantic search over past conversations.
+description: 向量記憶 語義記憶 Agent記憶 持久記憶 記憶系統 跨Session記憶 ベクトルメモリ エージェント記憶 벡터메모리 에이전트기억 Vector memory — persistent semantic memory for AI agents. Never lose context again.
 ---
 
 # 🧠 Vector Memory — 讓你的 Agent 不再失憶
+
+## 📥 一行安裝
+
+```bash
+curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/vector-memory/setup.sh | bash
+```
+
+## 多語言簡介
+
+**🇹🇼 繁中：** Qdrant 向量資料庫 + BGE-m3 嵌入——讓 Agent 記住一切，永不失憶。
+**🇨🇳 簡中：** Qdrant 向量数据库 + BGE-m3 嵌入——让 Agent 记住一切，永不失忆。
+**🇯🇵 日文：** QdrantベクトルDB + BGE-m3埋め込み——エージェントがすべてを記憶し、決して忘れない。
+**🇰🇷 韓文：** Qdrant 벡터DB + BGE-m3 임베딩——에이전트가 모든 것을 기억하고 절대 잊지 않습니다.
+**🇸🇦 阿文：** قاعدة بيانات Qdrant المتجهة + تضمين BGE-m3——الوكيل يتذكر كل شيء ولا ينسى أبداً.
+**🇮🇳 印地：** Qdrant वेक्टर DB + BGE-m3 एम्बेडिंग——एजेंट सब कुछ याद रखता है, कभी नहीं भूलता।
+
+---
 
 ## 痛點
 
@@ -146,6 +163,12 @@ python3 mcp_server.py
 - **配套項目：** [Skill Router](../skill-router/) — 讓記憶輔助路由決策
 
 ---
+
+## 📥 一行安裝
+
+```bash
+curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/vector-memory/setup.sh | bash
+```
 
 ## 授權
 

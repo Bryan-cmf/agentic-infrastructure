@@ -1,9 +1,26 @@
 ---
 name: skill-reporting
-description: 技能匯報 技能透明度 使用了咩技能 回覆附帶技能信息 技能使用追蹤 Skill usage reporting — append skill usage summary to every agent reply for transparency. Use when users can't see what skills/tools the agent used, when debugging agent behavior is opaque, or when building trust through transparency.
+description: 技能匯報 技能透明度 使用了咩技能 回覆附帶技能信息 スキルレポート 透明性 스킬리포팅 투명성 Skill usage reporting — append skill usage summary to every agent reply for transparency.
 ---
 
 # 📊 Skill Reporting — 讓 Agent 的每一步都透明可見
+
+## 📥 一行安裝
+
+```bash
+mkdir -p skills/skill-reporting && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skill-reporting/SKILL.md -o skills/skill-reporting/SKILL.md
+```
+
+## 多語言簡介
+
+**🇹🇼 繁中：** 每次回覆附帶技能使用摘要——讓 Agent 不再是一個黑箱。
+**🇨🇳 簡中：** 每次回复附带技能使用摘要——让 Agent 不再是一个黑箱。
+**🇯🇵 日文：** 毎回の応答にスキル使用サマリーを付加——エージェントをブラックボックスにしない。
+**🇰🇷 韓文：** 매 응답마다 스킬 사용 요약 첨부——에이전트를 블랙박스로 두지 않습니다.
+**🇸🇦 阿文：** ملخص استخدام المهارات مع كل رد——لا تجعل الوكيل صندوقاً أسود.
+**🇮🇳 印地：** हर जवाब के साथ स्किल उपयोग सारांश——एजेंट को ब्लैक बॉक्स न बनने दें।
+
+---
 
 ## 痛點
 
@@ -160,6 +177,12 @@ def inject_skill_report(response, skills_used):
 就這麼簡單。不需要安裝任何程式碼——這是一個**制度性技能**。
 
 ---
+
+## 📥 一行安裝
+
+```bash
+mkdir -p skills/skill-reporting && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skill-reporting/SKILL.md -o skills/skill-reporting/SKILL.md
+```
 
 ## 授權
 
