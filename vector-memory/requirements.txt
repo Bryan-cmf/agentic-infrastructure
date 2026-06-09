@@ -1,0 +1,14 @@
+# Vector Memory — Python Dependencies
+# =====================================
+# Install: pip install -r requirements.txt
+
+# Core
+qdrant-client>=1.13.0
+sentence-transformers>=3.0.0
+
+# MCP Protocol
+mcp>=1.0.0
+
+# Dashboard (optional)
+fastapi>=0.115.0
+uvicorn>=0.32.0

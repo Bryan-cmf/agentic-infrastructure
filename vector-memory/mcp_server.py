@@ -61,7 +61,16 @@ DECAY_LAMBDA = 0.01  # Decay rate per day
 
 # ── Initialize components ──────────────────────────
 print(f"🔄 Loading embedding model: {MODEL_NAME}...", file=sys.stderr)
-embedding_model = SentenceTransformer(MODEL_NAME, device="mps")
+# Auto-detect device: mps (Apple Silicon) → cuda (NVIDIA) → cpu (fallback)
+import torch
+if torch.backends.mps.is_available():
+    _device = "mps"
+elif torch.cuda.is_available():
+    _device = "cuda"
+else:
+    _device = "cpu"
+print(f"🔧 Using device: {_device}", file=sys.stderr)
+embedding_model = SentenceTransformer(MODEL_NAME, device=_device)
 EMBEDDING_DIM = embedding_model.get_sentence_embedding_dimension()
 print(f"✅ Model loaded ({EMBEDDING_DIM}dim)", file=sys.stderr)
 

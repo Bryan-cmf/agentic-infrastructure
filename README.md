@@ -1,4 +1,21 @@
-# 🧰 Agentic Infrastructure — Agent 基礎建設系列
+# 🧰 Agentic Infrastructure — Agent 基礎建設七件套
+
+> **七個獨立技能，解決 AI Agent 生態系統的七個結構性問題。**
+> 一鍵安裝，立即生效。支持任何 AI Agent 平台。
+
+---
+
+## 🎯 七個問題 · 七個方案
+
+| # | 問題 | 技能 | 安裝命令 |
+|---|------|------|--------|
+| 1 | 非英語用戶找不到技能 | 🌐 Skills Triggering | `curl -sSL` [`SKILL.md`](https://raw.githubusercontent.com/Bryan-cmf/openclaw-agent-toolkit/main/skills-triggering/SKILL.md) `-o skills/skills-triggering/SKILL.md` |
+| 2 | Agent 有技能但不知道用哪個 | 🔀 Skill Router | `curl -sSL` [`SKILL.md`](https://raw.githubusercontent.com/Bryan-cmf/openclaw-agent-toolkit/main/skill-router/SKILL.md) `-o skills/skill-router/SKILL.md` |
+| 3 | Agent 做了什麼無人知 | 📊 Skill Reporting | `curl -sSL` [`SKILL.md`](https://raw.githubusercontent.com/Bryan-cmf/openclaw-agent-toolkit/main/skill-reporting/SKILL.md) `-o skills/skill-reporting/SKILL.md` |
+| 4 | Agent 重啟後完全失憶 | 🧠 Vector Memory | `curl -sSL` [`setup.sh`](https://raw.githubusercontent.com/Bryan-cmf/openclaw-agent-toolkit/main/vector-memory/setup.sh) `\| bash` |
+| 5 | 技能越裝越多越來越亂 | 🎨 Skill Curator | `curl -sSL` [`SKILL.md`](https://raw.githubusercontent.com/Bryan-cmf/openclaw-agent-toolkit/main/skill-curator/SKILL.md) `-o skills/skill-curator/SKILL.md` |
+| 6 | 核心文件越來越臃腫 | 🧬 Agent Evolver | `curl -sSL` [`SKILL.md`](https://raw.githubusercontent.com/Bryan-cmf/openclaw-agent-toolkit/main/agent-evolver/SKILL.md) `-o skills/agent-evolver/SKILL.md` |
+| 7 | 每次都在事後才發現問題 | 🔮 Agent Previsor | `curl -sSL` [`SKILL.md`](https://raw.githubusercontent.com/Bryan-cmf/openclaw-agent-toolkit/main/agent-previsor/SKILL.md) `-o skills/agent-previsor/SKILL.md` |
 
 ---
 

@@ -8,12 +8,12 @@ WORKSPACE = Path(os.environ.get("OPENCLAW_WORKSPACE", Path.home() / ".openclaw/w
 SKILLS_DIRS = [WORKSPACE / "skills", WORKSPACE / ".agents" / "skills"]
 
 LANGUAGES = {
-    "zh": "[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]",
-    "ja": "[\u3040-\u309f\u30a0-\u30ff]",
-    "ko": "[\uac00-\ud7af]",
-    "ar": "[\u0600-\u06ff]",
-    "hi": "[\u0900-\u097f]",
-    "en": "[a-zA-Z]",
+    "zh": r"[\u4e00-\u9fff]",  # 繁中/簡中
+    "ja": r"[\u3040-\u309f\u30a0-\u30ff]",  # 日文
+    "ko": r"[\uac00-\ud7af]",  # 韓文
+    "ar": r"[\u0600-\u06ff]",  # 阿拉伯文
+    "hi": r"[\u0900-\u097f]",  # 印地文
+    "en": r"[a-zA-Z]",  # 英文
 }
 
 
