@@ -1,0 +1,16 @@
+# Qdrant storage data
+qdrant_storage/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backups
+*.bak
