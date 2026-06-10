@@ -41,40 +41,48 @@ mkdir -p skills/agentic-infra && curl -sSL https://raw.githubusercontent.com/Bry
 ├── Step 1: Skill Router 分類
 │   ├── 載入 skills/skill-router/SKILL.md
 │   ├── 將所有技能分類到 4類×10階段 路由矩陣
+│   ├── 確認輸出格式為 required_skills 結構化
 │   └── 輸出：路由矩陣覆蓋率
 │
-├── Step 2: Skills Triggering 驗證
+├── Step 2: Skill Compliance 部署 🆕
+│   ├── 載入 skills/skill-compliance/SKILL.md
+│   ├── 確認子代理 spawn 機制可用
+│   ├── 與 skill-router 組成門禁對
+│   └── 輸出：合規檢查器就緒
+│
+├── Step 3: Skills Triggering 驗證
 │   ├── 載入 skills/skills-triggering/SKILL.md
 │   ├── 測試關鍵詞覆蓋率
 │   ├── 標記觸發盲區
 │   └── 輸出：觸發覆蓋率報告
 │
-├── Step 3: Vector Memory 啟動
+├── Step 4: Vector Memory 啟動
 │   ├── 載入 skills/vector-memory/SKILL.md
 │   ├── 檢查 Qdrant 是否運行
 │   ├── 若無 → 嘗試啟動
 │   └── 輸出：記憶系統健康狀態
 │
-├── Step 4: Skill Reporting 掛載
+├── Step 5: Skill Reporting 掛載
 │   ├── 載入 skills/skill-reporting/SKILL.md
 │   ├── 確保每次回覆附帶技能使用信息
 │   └── 輸出：追蹤系統就緒
 │
-├── Step 5: Agent Evolver 排程
+├── Step 6: Agent Evolver 排程
 │   ├── 載入 skills/agent-evolver/SKILL.md
 │   ├── 建立月度自我進化排程
 │   └── 輸出：進化排程已設定
 │
-└── Step 6: 輸出初始化報告
+└── Step 7: 輸出初始化報告
     └── 格式：
-        🧰 Agentic Infrastructure v1.1 Bootstrap 完成
+        🧰 Agentic Infrastructure Bootstrap 完成
         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        Curator:    [N] 致命 [N] 警告 [N] 健康
-        Router:     覆蓋率 XX%
-        Triggering: 覆蓋率 XX%
-        Memory:     [狀態]
-        Reporting:  [狀態]
-        Evolver:    [狀態]
+        Curator:      [N] 致命 [N] 警告 [N] 健康
+        Router:       覆蓋率 XX%
+        Compliance:   就緒 ✅
+        Triggering:   覆蓋率 XX%
+        Memory:       [狀態]
+        Reporting:    [狀態]
+        Evolver:      [狀態]
         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -91,13 +99,16 @@ Bootstrap 完成後，Agent 在日常運作中自動：
 
 ```
 每次任務：
-  ① skill-router → 路由分類 + 推薦技能
+  ① skill-router → 路由分類 + 輸出強制技能清單（任務前）
   ② agent-previsor → 複雜任務時預判風險
-  ③ skill-reporting → 記錄技能使用
+  ③ skill-compliance → 子代理合規檢查（任務後）🆕
+  ④ skill-reporting → 記錄技能使用
 
 每月：
-  ④ agent-evolver → 自我進化檢查
+  ⑤ agent-evolver → 自我進化檢查
 ```
+
+**skill-router + skill-compliance 是兩個常駐技能，組成任務前後的門禁對。**
 
 ---
 
@@ -107,11 +118,14 @@ Bootstrap 完成後，Agent 在日常運作中自動：
 agentic-infra (第八技能 · 統一入口)
     │
     ├── Step 0 → skill-curator     (策展人)
-    ├── Step 1 → skill-router      (路由器)
-    ├── Step 2 → skills-triggering (觸發器)
-    ├── Step 3 → vector-memory     (記憶庫)
-    ├── Step 4 → skill-reporting   (記錄器)
-    └── Step 5 → agent-evolver     (進化者)
+    ├── Step 1 → skill-router      (路由器 · 常駐)
+    ├── Step 2 → skill-compliance  (合規器 · 常駐) 🆕
+    ├── Step 3 → skills-triggering (觸發器)
+    ├── Step 4 → vector-memory     (記憶庫)
+    ├── Step 5 → skill-reporting   (記錄器)
+    └── Step 6 → agent-evolver     (進化者)
 
 agent-previsor → 不屬於初始化管線，日常任務時獨立調用
+
+skill-router + skill-compliance = 門禁對（Pre-Gate + Post-Gate）
 ```

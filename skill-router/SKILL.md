@@ -105,6 +105,45 @@ mkdir -p skills/skill-router && curl -sSL https://raw.githubusercontent.com/Brya
 | 錯誤工具使用 | 頻繁 | 極少 | -80% |
 | 任務啟動回合數 | 3-5 | 1 | -60% |
 
+## 🔴 強制輸出格式（v1.1）
+
+> **skill-router 推薦的所有技能都是強制級。合規檢查器會驗證每一個是否被調用。**
+
+每次路由完成後，必須輸出以下結構化格式：
+
+```yaml
+# [路由完成] 任務：[任務描述]
+類別：[類別] × 階段：[階段]
+required_skills:
+  - [技能1]
+  - [技能2]
+  - [技能3]
+管線：[Step1] → [Step2] → [Step3]
+```
+
+### 為什麼全部強制？
+
+以前有 required/recommended 分級 → LLM 自行判斷 → 跳過「不重要」的技能。現在全部強制 → skill-compliance 做字串比對 → 無判斷空間 → 無法被跳過。
+
+### 與 skill-compliance 的整合
+
+```
+skill-router 輸出 required_skills
+         │
+         ▼
+    主 Agent 執行
+         │
+         ▼
+skill-compliance（子代理）→ 字串比對 → PASS/REJECT
+```
+
+## 🔗 常駐技能（與 skill-compliance 組成門禁對）
+
+skill-router 和 skill-compliance 是 Agentic Infrastructure 的兩個常駐技能，組成完整的校驗鏈：
+
+- **skill-router**：任務前 → 路由分類 → 輸出強制技能清單
+- **skill-compliance**：任務後 → 子代理機械比對 → 缺失就駁回
+
 ## 授權
 
 MIT

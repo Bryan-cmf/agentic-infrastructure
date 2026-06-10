@@ -208,25 +208,26 @@
 
 ---
 
-## 🆕 skill-compliance — 技能合規檢查（常駐技能）
+## 🆕 skill-compliance — 技能合規檢查（常駐技能 · 門禁對）
 
 ```markdown
 ## 自查：Skill Compliance Checker（技能合規檢查）
 
 ### 安裝檢查
 1. 確認 `skills/skill-compliance/SKILL.md` 存在
-2. 讀取該文件，確認駁回機制說明
+2. 讀取該文件，確認包含「子代理隔離」和「字串比對」字樣
 
 ### 功能檢查
-1. 回顧你上一次任務執行過程
-2. 檢查：skill-router 是否在任務前被調用？→ 是/否
-3. 檢查：推薦的技能是否全部被讀取？→ 列出缺失
-4. 檢查：如果有缺失 → 輸出駁回報告 + 要求重做
+1. 執行一次模擬任務
+2. skill-router 輸出 required_skills = [skill-A, skill-B]
+3. spawn skill-compliance 子代理
+4. 輸入 required_skills 和 actual_calls
+5. 驗證：只輸出 PASS 或 REJECT，無其他內容
 
 ### 通過標準
-- 能列出上一次任務的技能調用清單 → ✅
-- 能識別缺失技能 → ✅
-- 能輸出駁回報告 → ✅
+- 子代理 spawn 成功 → ✅
+- 輸出只有 PASS 或 REJECT → ✅
+- 缺失技能時正確 REJECT → ✅
 ```
 
 ---
