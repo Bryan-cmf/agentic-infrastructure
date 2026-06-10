@@ -79,6 +79,45 @@ mkdir -p skills/skill-router && curl -sSL https://raw.githubusercontent.com/Brya
 
 ## 🔧 技術細節
 
+### 三層推薦規則（v2.0 · 多用技能）
+
+**每一層的技能都是強制級。不給 Agent 裁減的空間。**
+
+#### 第 1 層：常駐層（每次回覆必須）
+
+| 技能 | 原因 |
+|------|------|
+| `skill-router` | 任務前路由分類 |
+| `skill-compliance` | 任務後合規檢查 |
+| `skill-reporting` | 每次回覆附技能使用信息 |
+
+#### 第 2 層：任務層（根據類別×階段自動匹配）
+
+| 類別 | 階段 | 關鍵詞 | 附加強制技能 |
+|------|------|--------|------------|
+| 💻 代碼 | 📋 規劃/🎨 設計 | 設計/網站/UI/架構/重構/寫功能 | `karpathy-guidelines` `spec-driven-development` |
+| 💻 代碼 | 💻 開發 | 寫代碼/開發/實現/Build | `karpathy-guidelines` `tdd` |
+| 💻 代碼 | 🧪 診斷 | Bug/Debug/報錯/修復/分析問題 | `diagnose` `agent-previsor` |
+| 💻 代碼 | 🚀 部署 | 部署/上線/Vercel/發布 | `deploy-vercel` |
+| 💰 金融 | 🔍 搜索 | 港股/股票/調研/DD | `ak-hk-stock-dd` `tavily-search` |
+| 💰 金融 | 📊 分析 | 估值/財務/DCF/報告 | `ak-financial-analyst` `dd-business-report` |
+| 🛠️ 日常 | 🔍 搜索 | 搜/查/找/調研 | `tavily-search` `firecrawl-search` |
+| 🛠️ 日常 | 📋 規劃 | 規劃/分析/下一步/討論/設計技能 | `agent-previsor` `idea-refine` |
+| 🛠️ 日常 | ⚙️ 維運 | 配置/Cron/監控/修復/同步 | `agent-previsor` |
+| 🛠️ 日常 | 💬 通訊 | 回覆/確認/對話/討論 | `agent-previsor`（複雜話題時） |
+| 🛠️ 日常 | 📊 分析 | 報告/數據/總結/審查 | `agent-previsor` |
+| 🎨 設計 | 🎨 設計 | UI/UX/美觀/風格/PPT/網頁 | `frontend-design` `design-taste-frontend` |
+
+#### 第 3 層：維護層（按頻率附加）
+
+| 頻率 | 技能 | 觸發條件 |
+|------|------|---------|
+| 每次回覆 | `skill-reporting` | 已在常駐層 |
+| 每 5 次回覆 | `skill-curator` | 快速檢查技能 description 健康 |
+| 每 10 次回覆 | `agent-previsor` | 全任務都過一次預判 |
+| 每週 | `infra-watchdog` | 完整巡查 |
+| 每月 | `agent-evolver` | 核心文件自我進化 |
+
 ### 路由表示例
 
 | 用戶說 | 類別 | 階段 | 推薦技能 |
