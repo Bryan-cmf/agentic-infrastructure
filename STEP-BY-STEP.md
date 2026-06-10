@@ -167,3 +167,20 @@ mkdir -p skills/skill-compliance && curl -sSL https://raw.githubusercontent.com/
 全部 8 步完成後，你的 Agent 基礎建設已就緒。每次任務都會自動經過門禁對（skill-router + skill-compliance），技能使用會被追蹤，記憶會被持久化。
 
 **日常使用只需正常對話——基礎設施在後台自動運行。**
+
+---
+
+## 第 9 步（建議）：設定定時巡查
+
+基礎設施不是裝完就沒事了。設定每週巡查，讓 Agent 定期檢查一切是否正常：
+
+```
+載入 skills/infra-watchdog/SKILL.md，為我建立一個每週巡查排程：
+
+1. 頻率：每週一 09:00
+2. 檢查全部 9 個基礎設施技能的健康狀態
+3. 有退化就報告，附修復建議（引用 STEP-BY-STEP 對應步驟）
+4. 不要自動修復，讓我自己決定
+
+現在執行第一次巡查，讓我看巡查報告的格式。
+```
