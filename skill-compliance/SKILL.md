@@ -7,9 +7,17 @@ description: 技能合規檢查 駁回機制 技能審計 合規審查 智能體
 
 ## 概念
 
-> **用 LLM 檢查 LLM 是同一種漏洞。這個技能用子代理隔離 + 機械字串比對來打破這個循環。**
+> **合規檢查是一個「行為」，不是一個「文件讀取」。**
 
-Skill Compliance 是任務後的「門禁」——檢查 skill-router 推薦的技能是否全部被調用。它被 spawn 為獨立子代理，沒有上下文污染，只做一件事：比對兩個名單。
+Skill Compliance 是任務後的「門禁」。它的調用方式是執行內聯檢查行為——比對 required_skills 和 actual_calls，輸出 PASS/REJECT。不需載入任何文檔，因為檢查邏輯已內化。
+
+## 🔴 什麼叫「調用 skill-compliance」
+
+以下行為**任一**即視為已調用：
+- 執行內聯合規檢查（比對兩個清單 + 輸出 PASS/REJECT）← 主要方式
+- `read(skill-compliance/SKILL.md)` ← 可選，非必須
+
+**實質 > 儀式。**
 
 ## 📥 一行安裝
 
