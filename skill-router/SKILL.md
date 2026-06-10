@@ -79,44 +79,41 @@ mkdir -p skills/skill-router && curl -sSL https://raw.githubusercontent.com/Brya
 
 ## 🔧 技術細節
 
-### 三層推薦規則（v2.0 · 多用技能）
+### 三層技能體系（v3.0 · 基礎透明 · 專項強制）
 
-**每一層的技能都是強制級。不給 Agent 裁減的空間。**
+**基礎設施層自動運行，專項技能層強制調用。**
 
-#### 第 1 層：常駐層（每次回覆必須）
+#### 🏗️ 基礎設施層（透明 · 自動 · 不顯示）
 
-| 技能 | 原因 |
-|------|------|
-| `skill-router` | 任務前路由分類 |
-| `skill-compliance` | 任務後合規檢查 |
-| `skill-reporting` | 每次回覆附技能使用信息 |
+| 技能 | 觸發 | 說明 |
+|------|------|------|
+| `skill-router` | 每任務 | 自動路由分類 |
+| `skill-compliance` | 每任務 | 自動合規檢查（只檢查專項層） |
+| `skill-reporting` | 每回覆 | 自動追蹤（footer 顯示） |
 
-#### 第 2 層：任務層（根據類別×階段自動匹配）
+#### 🎯 專項技能層（強制 · 顯示 · 檢查）
 
-| 類別 | 階段 | 關鍵詞 | 附加強制技能 |
-|------|------|--------|------------|
-| 💻 代碼 | 📋 規劃/🎨 設計 | 設計/網站/UI/架構/重構/寫功能 | `karpathy-guidelines` `spec-driven-development` |
-| 💻 代碼 | 💻 開發 | 寫代碼/開發/實現/Build | `karpathy-guidelines` `tdd` |
-| 💻 代碼 | 🧪 診斷 | Bug/Debug/報錯/修復/分析問題 | `diagnose` `agent-previsor` |
-| 💻 代碼 | 🚀 部署 | 部署/上線/Vercel/發布 | `deploy-vercel` |
+| 類別 | 階段 | 關鍵詞 | 強制載入的專項技能 |
+|------|------|--------|------------------|
+| 💻 代碼 | 📋 規劃 | 設計/架構/規劃/討論 | `software-architect` `architecture-patterns` `idea-refine` |
+| 💻 代碼 | 💻 開發 | 寫代碼/開發/實現 | `karpathy-guidelines` `tdd` |
+| 💻 代碼 | 🧪 診斷/審查 | Bug/報錯/審查/審計/重構 | `software-architect` `architecture-patterns` `agent-previsor` |
+| 💻 代碼 | 🚀 部署 | 部署/上線/Vercel | `deploy-vercel` |
 | 💰 金融 | 🔍 搜索 | 港股/股票/調研/DD | `ak-hk-stock-dd` `tavily-search` |
 | 💰 金融 | 📊 分析 | 估值/財務/DCF/報告 | `ak-financial-analyst` `dd-business-report` |
-| 🛠️ 日常 | 🔍 搜索 | 搜/查/找/調研 | `tavily-search` `firecrawl-search` |
-| 🛠️ 日常 | 📋 規劃 | 規劃/分析/下一步/討論/設計技能 | `agent-previsor` `idea-refine` |
-| 🛠️ 日常 | ⚙️ 維運 | 配置/Cron/監控/修復/同步 | `agent-previsor` |
-| 🛠️ 日常 | 💬 通訊 | 回覆/確認/對話/討論 | `agent-previsor`（複雜話題時） |
-| 🛠️ 日常 | 📊 分析 | 報告/數據/總結/審查 | `agent-previsor` |
-| 🎨 設計 | 🎨 設計 | UI/UX/美觀/風格/PPT/網頁 | `frontend-design` `design-taste-frontend` |
+| 🛠️ 日常 | 📋 規劃 | 規劃/下一步/討論 | `agent-previsor` `idea-refine` |
+| 🛠️ 日常 | ⚙️ 維運 | 配置/修復/同步 | `agent-previsor` |
+| 🛠️ 日常 | 📊 分析 | 報告/總結/審查/審計 | `agent-previsor` `software-architect` |
+| 🎨 設計 | 🎨 設計 | UI/網站/前端/PPT | `frontend-design` `design-taste-frontend` |
+| 🎨 設計 | 🔍 審查 | UX審查/設計審查/用戶體驗 | `design-taste-frontend` `ui-ux-pro-max` |
 
-#### 第 3 層：維護層（按頻率附加）
+#### 🔧 維護層（按頻率 · 顯示）
 
-| 頻率 | 技能 | 觸發條件 |
-|------|------|---------|
-| 每次回覆 | `skill-reporting` | 已在常駐層 |
-| 每 5 次回覆 | `skill-curator` | 快速檢查技能 description 健康 |
-| 每 10 次回覆 | `agent-previsor` | 全任務都過一次預判 |
-| 每週 | `infra-watchdog` | 完整巡查 |
-| 每月 | `agent-evolver` | 核心文件自我進化 |
+| 頻率 | 技能 |
+|------|------|
+| 每 5 次回覆 | `skill-curator` |
+| 每週 | `infra-watchdog` |
+| 每月 | `agent-evolver` |
 
 ### 路由表示例
 
@@ -144,44 +141,55 @@ mkdir -p skills/skill-router && curl -sSL https://raw.githubusercontent.com/Brya
 | 錯誤工具使用 | 頻繁 | 極少 | -80% |
 | 任務啟動回合數 | 3-5 | 1 | -60% |
 
-## 🔴 強制輸出格式（v1.1）
+## 🔴 Router v3.0：基礎透明 · 專項強制
 
-> **skill-router 推薦的所有技能都是強制級。合規檢查器會驗證每一個是否被調用。**
+### 兩層技能體系
 
-每次路由完成後，必須輸出以下結構化格式：
+```
+┌─────────────────────────────────────────────┐
+│  基礎設施層（透明 · 自動運行 · 不顯示給用戶）  │
+│  skill-router      → 每次任務前自動路由       │
+│  skill-compliance  → 每次任務後自動檢查       │
+│  skill-reporting   → 每次回覆自動附追踪        │
+└─────────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────────┐
+│  專項技能層（強制調用 · 顯示給用戶）           │
+│  根據類別×階段匹配領域技能                    │
+│  這些才是真正做事的技能                       │
+│  合規檢查只檢查這一層                         │
+└─────────────────────────────────────────────┘
+```
+
+### 輸出格式（v3.0）
+
+**只顯示專項技能。基礎設施自動運行，不出現在 required_skills 中。**
 
 ```yaml
-# [路由完成] 任務：[任務描述]
-類別：[類別] × 階段：[階段]
-required_skills:
-  - [技能1]
-  - [技能2]
-  - [技能3]
-管線：[Step1] → [Step2] → [Step3]
+🔀 Router v3.0：[類別] × [階段]
+  → 專項強制：[skill-A, skill-B, skill-C]
 ```
 
-### 為什麼全部強制？
+### 為什麼這樣改？
 
-以前有 required/recommended 分級 → LLM 自行判斷 → 跳過「不重要」的技能。現在全部強制 → skill-compliance 做字串比對 → 無判斷空間 → 無法被跳過。
+v2.0 的問題：每次輸出 [skill-router, skill-compliance, skill-reporting, ...]，用戶看到全是基礎設施，真正做事的技能被淹沒。
 
-### 與 skill-compliance 的整合
+v3.0：基礎設施像操作系統一樣在後台運行。用戶只看到「這次用了 software-architect 做架構審查」。
+
+### 與 skill-compliance 的整合（v3.0）
 
 ```
-skill-router 輸出 required_skills
+skill-router → 專項強制清單（不含基礎設施）
          │
          ▼
-    主 Agent 執行
+    主 Agent 載入專項技能 + 執行
          │
          ▼
-skill-compliance（子代理）→ 字串比對 → PASS/REJECT
+skill-compliance → 只檢查專項技能是否被調用
 ```
 
-## 🔗 常駐技能（與 skill-compliance 組成門禁對）
-
-skill-router 和 skill-compliance 是 Agentic Infrastructure 的兩個常駐技能，組成完整的校驗鏈：
-
-- **skill-router**：任務前 → 路由分類 → 輸出強制技能清單
-- **skill-compliance**：任務後 → 子代理機械比對 → 缺失就駁回
+**基礎設施技能不在合規範圍內——它們是自動運行的，不需檢查。**
 
 ## 授權
 
