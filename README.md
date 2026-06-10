@@ -1,77 +1,51 @@
 # 🧰 Agentic Infrastructure — Agent 基礎建設十件套
 
-> **八個獨立技能，解決 AI Agent 生態系統的八個結構性問題。**
+> **十個獨立技能，解決 AI Agent 生態系統的十個結構性問題。**
 >
-> **Eight standalone skills solving eight structural problems in the AI agent ecosystem.**
+> **Ten standalone skills solving ten structural problems in the AI agent ecosystem.**
 
 ---
 
 ## 🚀 快速開始 · Quick Start
 
-### 第一步：安裝全部技能
+### 👉 一鍵一鍵初始化：打開 [`INIT-PROMPTS.md`](./INIT-PROMPTS.md)
 
-```bash
-# ⑧ Agentic Infra — 統一入口 + 編排層（先安裝這個！）
-mkdir -p skills/agentic-infra && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/agentic-infra/SKILL.md -o skills/agentic-infra/SKILL.md
+**10 段提示詞，一段一段複製貼給你的 Agent。跑完就完成了。**
 
-# ① Skills Triggering — 多語言技能觸發
-mkdir -p skills/skills-triggering && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skills-triggering/SKILL.md -o skills/skills-triggering/SKILL.md
+### 或：一次性安裝全部技能文件
 
-# ② Skill Router — 任務技能路由
-mkdir -p skills/skill-router && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skill-router/SKILL.md -o skills/skill-router/SKILL.md
-
-# ③ Skill Reporting — 技能使用透明度
-mkdir -p skills/skill-reporting && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skill-reporting/SKILL.md -o skills/skill-reporting/SKILL.md
-
-# ④ Vector Memory — 向量記憶持久化
-curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/vector-memory/setup.sh | bash
-
-# ⑤ Skill Curator — 技能全生命週期策展
-mkdir -p skills/skill-curator && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skill-curator/SKILL.md -o skills/skill-curator/SKILL.md
-
-# ⑥ Agent Evolver — 核心文件自我進化
-mkdir -p skills/agent-evolver && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/agent-evolver/SKILL.md -o skills/agent-evolver/SKILL.md
-
-# ⑦ Agent Previsor — 事前預判博弈
-mkdir -p skills/agent-previsor && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/agent-previsor/SKILL.md -o skills/agent-previsor/SKILL.md
-```
-
-### 第二步：複製 Bootstrap Prompt 到 AGENTS.md
-
-打開你的 Agent 的 `AGENTS.md`（或系統 prompt），貼上 [`BOOTSTRAP.md`](./BOOTSTRAP.md) 的全部內容。
-
-### 第三步：對 Agent 說「執行 Bootstrap 初始化」
-
-Agent 會自動執行 6-Step 初始化管線（技能掃描 → 關鍵詞注入 → 路由分類 → 記憶啟動 → 追蹤掛載 → 進化排程），完成後輸出報告。
-
-**一分鐘內，你的 Agent 基礎建設就完成了。**
-
-<details>
-<summary>📋 全部一鍵安裝（發給任何 AI Agent）</summary>
+複製以下整段給你的 Agent：
 
 ```
-請安裝 Agentic Infrastructure 十件套：
+請執行以下安裝指令：
 
-mkdir -p skills/agentic-infra && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/agentic-infra/SKILL.md -o skills/agentic-infra/SKILL.md
 mkdir -p skills/skills-triggering && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skills-triggering/SKILL.md -o skills/skills-triggering/SKILL.md
 mkdir -p skills/skill-router && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skill-router/SKILL.md -o skills/skill-router/SKILL.md
 mkdir -p skills/skill-reporting && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skill-reporting/SKILL.md -o skills/skill-reporting/SKILL.md
-curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/vector-memory/setup.sh | bash
+mkdir -p skills/vector-memory && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/vector-memory/SKILL.md -o skills/vector-memory/SKILL.md
 mkdir -p skills/skill-curator && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skill-curator/SKILL.md -o skills/skill-curator/SKILL.md
 mkdir -p skills/agent-evolver && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/agent-evolver/SKILL.md -o skills/agent-evolver/SKILL.md
 mkdir -p skills/agent-previsor && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/agent-previsor/SKILL.md -o skills/agent-previsor/SKILL.md
+mkdir -p skills/agentic-infra && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/agentic-infra/SKILL.md -o skills/agentic-infra/SKILL.md
+mkdir -p skills/skill-compliance && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skill-compliance/SKILL.md -o skills/skill-compliance/SKILL.md
+mkdir -p skills/infra-watchdog && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/infra-watchdog/SKILL.md -o skills/infra-watchdog/SKILL.md
+
+安裝完成後列出所有已安裝的技能。
 ```
-</details>
+
+然後打開 [`INIT-PROMPTS.md`](./INIT-PROMPTS.md)，從第 1 步開始，一段一段貼。
 
 ---
 
-## 🎯 八個痛點 · 八個方案
+## 🎯 十個痛點 · 十個方案
 
 | # | 痛點 | 方案 | 一句話 |
 |---|------|------|--------|
 | 🧰 | 技能各自獨立，缺少統一入口 | **Agentic Infra** | 一鍵 Bootstrap 初始化。安裝→啟動→完成 |
+| 🩺 | 裝完就忘了，不知道技能還能不能用 | **Infra Watchdog** | 每週定時巡查，報告退化，不自動修復 |
 | 🌐 | 非英語用戶找不到技能 | **Skills Triggering** | 用使用者的語言定義技能觸發詞 |
 | 🔀 | 技能太多，不知道該用哪個 | **Skill Router** | 類別×階段矩陣自動路由 |
+| 🛡️ | Agent 知道要用技能但會跳過 | **Skill Compliance** | 任務後內聯檢查，缺失就駁回 |
 | 📊 | Agent 是黑箱，做了什麼無人知 | **Skill Reporting** | 每次回覆附帶技能使用摘要 |
 | 🧠 | 重啟後完全失憶，從零開始 | **Vector Memory** | Qdrant+BGE-m3 持久化 |
 | 🎨 | 技能越裝越多，越來越亂 | **Skill Curator** | 掃描→診斷→調適 |
@@ -127,12 +101,14 @@ mkdir -p skills/agent-previsor && curl -sSL https://raw.githubusercontent.com/Br
 
 ---
 
-## 🏗️ 八層架構 · Architecture
+## 🏗️ 十層架構 · Architecture
 
 ```
 🧰 Agentic Infra        →  編排層：統一入口，一鍵 Bootstrap
+🩺 Infra Watchdog       →  巡查層：每週定時，只報告不自動修復
 🌐 Skills Triggering    →  發現層：技能被正確發現
-🔀 Skill Router         →  路由層：任務匹配技能
+🔀 Skill Router         →  路由層：任務匹配技能（常駐）
+🛡️ Skill Compliance     →  合規層：任務後內聯檢查（常駐）
 📊 Skill Reporting      →  透明度層：每一步可見
 🧠 Vector Memory        →  基礎層：永不失憶
 🎨 Skill Curator        →  維護層：技能健康管理
