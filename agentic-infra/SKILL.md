@@ -26,34 +26,32 @@ mkdir -p skills/agentic-infra && curl -sSL https://raw.githubusercontent.com/Bry
 
 ## 🚀 Bootstrap 執行流程
 
-當此技能被觸發時，按以下順序強制執行（不可跳步）：
+當此技能被觸發時，按以下順序強制執行（不可跳步）。
+
+**每個 Step 有兩條路徑：A（腳本優先）→ 失敗則走 B（LLM 原生，永遠可用）。**
 
 ```
 🧰 Agentic Infra Bootstrap Pipeline
 │
 ├── Step 0: Skill Curator 掃描
-│   ├── 載入 skills/skill-curator/SKILL.md
-│   ├── 掃描技能庫全部技能
+│   ├── 路徑A：執行 scan_all.py（如可用）
+│   ├── 路徑B：LLM 原生掃描（讀 description → 檢查中英關鍵詞 → 注入）
 │   ├── 診斷：致命/警告/健康 三級
-│   ├── 修復：注入中文關鍵詞、修復格式損壞
 │   └── 輸出：健康報告摘要
 │
 ├── Step 1: Skill Router 分類
-│   ├── 載入 skills/skill-router/SKILL.md
+│   ├── LLM 原生（不需腳本）：讀 SKILL.md → 按路由表分類
 │   ├── 將所有技能分類到 4類×10階段 路由矩陣
-│   ├── 確認輸出格式為 required_skills 結構化
 │   └── 輸出：路由矩陣覆蓋率
 │
 ├── Step 2: Skill Compliance 部署 🆕
-│   ├── 載入 skills/skill-compliance/SKILL.md
-│   ├── 確認子代理 spawn 機制可用
-│   ├── 與 skill-router 組成門禁對
+│   ├── 檢查平台是否支援子代理 spawn
+│   ├── 支援 → 子代理模式 / 不支援 → 內聯檢查模式
 │   └── 輸出：合規檢查器就緒
 │
 ├── Step 3: Skills Triggering 驗證
-│   ├── 載入 skills/skills-triggering/SKILL.md
-│   ├── 測試關鍵詞覆蓋率
-│   ├── 標記觸發盲區
+│   ├── 路徑A：執行 skills-triggering.py（如可用）
+│   ├── 路徑B：LLM 原生（構造測試句子 → 檢查觸發）
 │   └── 輸出：觸發覆蓋率報告
 │
 ├── Step 4: Vector Memory 啟動

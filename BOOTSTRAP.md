@@ -15,49 +15,103 @@
 
 ## 🔰 首次啟動：執行 Bootstrap 初始化
 
-如果你是第一次啟動（或技能庫有變更），執行以下初始化管線：
+如果你是第一次啟動（或技能庫有變更），執行以下初始化管線。
+
+**每個 Step 有兩條路徑：A（腳本自動化，優先嘗試）→ 失敗則走 B（LLM 原生執行，永遠可用）。**
+
+---
 
 ### Step 0: 技能掃描與關鍵詞注入
-載入 `skills/skill-curator/SKILL.md` → 掃描你的技能庫 → 診斷健康狀態 → 自動注入中文關鍵詞 → 修復格式問題
-- 驗證：輸出技能健康報告（致命/警告/健康 三級）
+
+**路徑 A（腳本）：** 執行 `python3 scan_all.py --skills-dir skills/`
+- 成功 → 輸出健康報告 → 進入 Step 1
+- 失敗（如 macOS Unicode regex 報錯）→ 走路徑 B
+
+**路徑 B（LLM 原生）：**
+1. 列出 `skills/` 目錄下所有技能資料夾
+2. 對每個技能，讀取其 SKILL.md 的 `description:` 欄位
+3. 檢查：(a) 是否有中文關鍵詞 (b) 格式是否正確 (c) description 是否為空
+4. 分類：🔴致命（無 description/空）| 🟡警告（缺中文關鍵詞）| 🟢健康
+5. 對 🟡 的技能，根據技能內容推斷合適的中文關鍵詞，用 edit tool 注入
+6. 輸出健康報告
+
+---
 
 ### Step 1: 技能路由分類
-載入 `skills/skill-router/SKILL.md` → 將所有技能分類到 4類×10階段 路由矩陣
-- 驗證：路由矩陣覆蓋率 ≥ 80%
-- 確認輸出格式為 required_skills 結構化（全部強制）
+
+**說明：** skill-router 的分類是 LLM 原生能力，不需腳本。直接執行：
+
+1. 載入 `skills/skill-router/SKILL.md`
+2. 閱讀其中的「4類×10階段路由表」
+3. 將你技能庫中的每個技能，根據其功能和描述，填入對應的類別×階段格子
+4. 輸出路由矩陣（表格格式）
+5. 確認輸出格式為 required_skills 結構化（全部強制）
+
+---
 
 ### Step 2: 技能合規檢查器部署
-載入 `skills/skill-compliance/SKILL.md` → 確認子代理 spawn 機制可用 → 與 skill-router 組成門禁對
-- 驗證：合規檢查器就緒
+
+1. 載入 `skills/skill-compliance/SKILL.md`
+2. 確認你的平台是否支援子代理 spawn（如 OpenClaw 的 sessions_spawn）
+3. 如支援 → 標記為「可用」，與 skill-router 組成門禁對
+4. 如不支援 → 改為內聯檢查模式（在回覆中手動比對技能清單）
+
+---
 
 ### Step 3: 觸發覆蓋率驗證
-載入 `skills/skills-triggering/SKILL.md` → 測試關鍵詞覆蓋 → 標記觸發盲區 → 補強缺失關鍵詞
-- 驗證：觸發覆蓋率報告
+
+**路徑 A（腳本）：** 執行 `python3 skills-triggering.py --skills-dir skills/ --verify`
+- 成功 → 輸出覆蓋率報告
+- 失敗 → 走路徑 B
+
+**路徑 B（LLM 原生）：**
+1. 隨機挑選 5 個技能
+2. 對每個技能，用其中文關鍵詞構造一個測試句子（如技能含「港股調研」，則構造「幫我調研 00058 這隻港股」）
+3. 檢查：如果你收到這個句子，你會自然地調用該技能嗎？
+4. 輸出：每個技能的觸發測試結果 + 總體覆蓋率
+
+---
 
 ### Step 4: 向量記憶啟動
-載入 `skills/vector-memory/SKILL.md` → 確保 Qdrant 運行 → 建立初始索引
-- 驗證：Qdrant alive + collection OK
+
+1. 載入 `skills/vector-memory/SKILL.md`
+2. `curl -s http://localhost:6333/healthz` → 檢查 Qdrant 是否運行
+3. 如果 Qdrant 未運行 → 執行 `setup.sh` 或手動啟動 Docker
+4. 檢查 collection 是否存在：`curl -s http://localhost:6333/collections`
+5. 輸出：Qdrant 狀態 + collection 狀態
+
+---
 
 ### Step 5: 技能使用追蹤啟動
-載入 `skills/skill-reporting/SKILL.md` → 掛載追蹤系統
-- 驗證：追蹤系統就緒
+
+1. 載入 `skills/skill-reporting/SKILL.md`
+2. 從現在開始，每次回覆末尾附帶技能使用信息
+3. 格式：`> 🛠️ 使用技能：skill-A（用途）+ skill-B（用途）`
+
+---
 
 ### Step 6: 自我進化排程
-載入 `skills/agent-evolver/SKILL.md` → 建立月度自我進化排程
-- 驗證：進化排程已設定
+
+1. 載入 `skills/agent-evolver/SKILL.md`
+2. 建立月度排程（每月 1 號），提醒你執行核心文件自我進化
+3. 如果你的平台支援 cron → 建立 cron job
+4. 如果不支援 → 建立一個記憶提醒，每月觸發
+
+---
 
 ### Step 7: 輸出初始化完成報告
+
 匯總全部 Step 結果，輸出格式：
 ```
 🧰 Agentic Infrastructure Bootstrap 完成報告
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Step 0: Skill Curator → [健康報告摘要]
+Step 0: Skill Curator → [路徑A/B] [N]致命 [N]警告 [N]健康
 Step 1: Skill Router  → [路由矩陣覆蓋率]
-Step 2: Compliance    → [就緒狀態]
+Step 2: Compliance    → [就緒狀態 / 路徑]
 Step 3: Triggering    → [觸發覆蓋率]
 Step 4: Vector Memory → [Qdrant 狀態]
-Step 5: Reporting     → [追蹤系統狀態]
-Step 6: Evolver       → [排程設定狀態]
+Step 5: Reporting     → [追蹤系統已啟動]
+Step 6: Evolver       → [排程狀態]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -76,31 +130,9 @@ Step 6: Evolver       → [排程設定狀態]
 skill-router + skill-compliance 是兩個常駐技能，組成任務前後的門禁對：
 - skill-router 推薦什麼 → skill-compliance 就檢查什麼
 - 全部強制，全部檢查，缺失就駁回
-```
 
----
+## ⚠️ 降級策略
 
-## 第二步：告訴你的 Agent
-
-複製完後，對你的 Agent 說：
-
-> **請執行 Bootstrap 初始化**
-
-Agent 會自動按照 BOOTSTRAP 流程執行 7 個 Step，完成後輸出一份初始化報告。
-
----
-
-## 原理
-
-```
-用戶在 AGENTS.md 中放入 Bootstrap Prompt
-    │
-    ▼
-Agent 每次啟動時讀取 AGENTS.md
-    │
-    ▼
-看到 Bootstrap 指令 → 自檢是否已初始化
-    │
-    ├── 首次 → 執行 7-Step 初始化管線
-    └── 已初始化 → 正常運行（門禁對 + 追蹤 + 進化自動運作）
+如果任何 Step 的路徑 A（腳本）失敗，自動切換到路徑 B（LLM 原生）。
+LLM 原生路徑永遠可用，因為 Agent 本身就能讀文件、分類、測試。
 ```
