@@ -1,4 +1,4 @@
-# 🧰 Agentic Infrastructure — Agent 基礎建設七件套
+# 🧰 Agentic Infrastructure — Agent 基礎建設十件套
 
 > **八個獨立技能，解決 AI Agent 生態系統的八個結構性問題。**
 >
@@ -50,7 +50,7 @@ Agent 會自動執行 6-Step 初始化管線（技能掃描 → 關鍵詞注入 
 <summary>📋 全部一鍵安裝（發給任何 AI Agent）</summary>
 
 ```
-請安裝 Agentic Infrastructure 八件套：
+請安裝 Agentic Infrastructure 十件套：
 
 mkdir -p skills/agentic-infra && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/agentic-infra/SKILL.md -o skills/agentic-infra/SKILL.md
 mkdir -p skills/skills-triggering && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/skills-triggering/SKILL.md -o skills/skills-triggering/SKILL.md
