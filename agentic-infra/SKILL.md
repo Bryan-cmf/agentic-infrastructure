@@ -1,0 +1,117 @@
+---
+name: agentic-infra
+description: Agent基礎建設 智能體基礎設施 技能管理 記憶系統 技能觸發 技能路由 自我進化 事前預判 bootstrap 初始化 infra infrastructure agent-toolkit 系統優化 技能初始化 啟動設定 agentic-infrastructure — Unified entry skill that bootstraps and orchestrates all 7 Agentic Infrastructure sub-skills. Triggers on "bootstrap", "初始化", "infra", "基礎建設", "啟動基礎設施".
+---
+
+# 🧰 Agentic Infra — Agentic Infrastructure 統一入口
+
+## 概念
+
+> 七個技能各自獨立。這個技能把它們串成一條完整管線。
+
+Agentic Infra 是七件套的第八個技能——統一入口 + 編排層。當它被觸發時，自動按正確順序加載和執行全部 7 個子技能。
+
+## 📥 一行安裝
+
+```bash
+mkdir -p skills/agentic-infra && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/agentic-infra/SKILL.md -o skills/agentic-infra/SKILL.md
+```
+
+## 觸發方式
+
+| 方式 | 說明 |
+|------|------|
+| 手動 | `bootstrap`、`初始化`、`基礎建設`、`infra`、`啟動基礎設施` |
+| 自動 | 首次安裝後，Agent 讀取 BOOTSTRAP.md → 自動觸發初始化管線 |
+
+## 🚀 Bootstrap 執行流程
+
+當此技能被觸發時，按以下順序強制執行（不可跳步）：
+
+```
+🧰 Agentic Infra Bootstrap Pipeline
+│
+├── Step 0: Skill Curator 掃描
+│   ├── 載入 skills/skill-curator/SKILL.md
+│   ├── 掃描技能庫全部技能
+│   ├── 診斷：致命/警告/健康 三級
+│   ├── 修復：注入中文關鍵詞、修復格式損壞
+│   └── 輸出：健康報告摘要
+│
+├── Step 1: Skill Router 分類
+│   ├── 載入 skills/skill-router/SKILL.md
+│   ├── 將所有技能分類到 4類×10階段 路由矩陣
+│   └── 輸出：路由矩陣覆蓋率
+│
+├── Step 2: Skills Triggering 驗證
+│   ├── 載入 skills/skills-triggering/SKILL.md
+│   ├── 測試關鍵詞覆蓋率
+│   ├── 標記觸發盲區
+│   └── 輸出：觸發覆蓋率報告
+│
+├── Step 3: Vector Memory 啟動
+│   ├── 載入 skills/vector-memory/SKILL.md
+│   ├── 檢查 Qdrant 是否運行
+│   ├── 若無 → 嘗試啟動
+│   └── 輸出：記憶系統健康狀態
+│
+├── Step 4: Skill Reporting 掛載
+│   ├── 載入 skills/skill-reporting/SKILL.md
+│   ├── 確保每次回覆附帶技能使用信息
+│   └── 輸出：追蹤系統就緒
+│
+├── Step 5: Agent Evolver 排程
+│   ├── 載入 skills/agent-evolver/SKILL.md
+│   ├── 建立月度自我進化排程
+│   └── 輸出：進化排程已設定
+│
+└── Step 6: 輸出初始化報告
+    └── 格式：
+        🧰 Agentic Infrastructure v1.1 Bootstrap 完成
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        Curator:    [N] 致命 [N] 警告 [N] 健康
+        Router:     覆蓋率 XX%
+        Triggering: 覆蓋率 XX%
+        Memory:     [狀態]
+        Reporting:  [狀態]
+        Evolver:    [狀態]
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+## 🔴 鐵律
+
+- **啟動時必須按順序執行 6 個 Step，不可跳步**
+- **每個 Step 必須載入對應 SKILL.md（用 read tool 或等效機制）**
+- **每個 Step 完成後必須輸出驗證結果**
+- **Step 6 必須產出匯總報告**
+
+## 🔄 日常使用（Bootstrap 後）
+
+Bootstrap 完成後，Agent 在日常運作中自動：
+
+```
+每次任務：
+  ① skill-router → 路由分類 + 推薦技能
+  ② agent-previsor → 複雜任務時預判風險
+  ③ skill-reporting → 記錄技能使用
+
+每月：
+  ④ agent-evolver → 自我進化檢查
+```
+
+---
+
+## 與子技能的關係
+
+```
+agentic-infra (第八技能 · 統一入口)
+    │
+    ├── Step 0 → skill-curator     (策展人)
+    ├── Step 1 → skill-router      (路由器)
+    ├── Step 2 → skills-triggering (觸發器)
+    ├── Step 3 → vector-memory     (記憶庫)
+    ├── Step 4 → skill-reporting   (記錄器)
+    └── Step 5 → agent-evolver     (進化者)
+
+agent-previsor → 不屬於初始化管線，日常任務時獨立調用
+```

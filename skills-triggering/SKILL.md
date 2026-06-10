@@ -91,7 +91,7 @@ mkdir -p skills/skills-triggering && curl -sSL https://raw.githubusercontent.com
 
 **手動精修**（最精準）：直接修改 SKILL.md 的 `description` 欄位，在英文前面插入中文關鍵詞。
 
-**批量腳本**：`python3 skills-triggering.py --skills-dir ~/.openclaw/workspace/skills` — 自動掃描所有技能，推斷中文關鍵詞，備份原文件。
+**批量腳本**：`python3 skills-triggering.py --skills-dir {你的技能目錄路徑}` — 自動掃描所有技能，推斷中文關鍵詞，備份原文件。
 
 ### 效果數據
 

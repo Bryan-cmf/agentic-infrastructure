@@ -1,12 +1,49 @@
-# 🚀 Agentic Infrastructure 七件套 — 完整使用指南
+# 🚀 Agentic Infrastructure 八件套 — 完整使用指南
 
 > **從安裝到體驗，一步步引導你與 Agent 建立深度協作。**
 
 ---
 
-## 📋 安裝順序（為什麼是這個順序？）
+## 🔰 Phase 0: Agentic Infra — 一鍵 Bootstrap 初始化（新增 ⭐）
+
+### 為什麼要有 Phase 0？
+
+以前用戶安裝七件套後，每個技能各自獨立，用戶不知道下一步。**現在有了統一入口。**
+
+### 0.1 安裝
+
+```bash
+mkdir -p skills/agentic-infra && curl -sSL https://raw.githubusercontent.com/Bryan-cmf/agentic-infrastructure/main/agentic-infra/SKILL.md -o skills/agentic-infra/SKILL.md
+```
+
+### 0.2 初始配置提示詞
+
+將 [`BOOTSTRAP.md`](./BOOTSTRAP.md) 的全部內容複製到你的 `AGENTS.md` 中。
+
+### 0.3 體驗提示詞
+
+> **執行 Bootstrap 初始化**
+
+Agent 會自動執行 6-Step 初始化管線：
 
 ```
+Step 0: Skill Curator  → 掃描技能庫 + 注入中文關鍵詞 + 修復格式
+Step 1: Skill Router   → 將技能分類到 4類×10階段 路由矩陣
+Step 2: Triggering     → 測試關鍵詞覆蓋率 + 補強觸發盲區
+Step 3: Vector Memory  → 啟動 Qdrant + 建立初始索引
+Step 4: Reporting      → 掛載技能使用追蹤
+Step 5: Evolver        → 建立月度自我進化排程
+Step 6: 輸出初始化完成報告
+```
+
+**一分鐘內，你的 Agent 基礎建設完成。**
+
+---
+
+## 📋 手動安裝順序（如需逐個安裝）
+
+```
+Phase 0: 編排層 → Bootstrap 初始化 + 統一入口（🆕 八件套新增）
 Phase 1: 基礎層 → 讓 Agent 記住一切
 Phase 2: 發現層 → 讓技能能被觸發
 Phase 3: 路由層 → 讓任務匹配技能
@@ -18,6 +55,7 @@ Phase 7: 預判層 → 事前預見所有坑
 
 **為什麼是這個順序？**
 
+- **沒有編排**（Phase 0），各技能各自獨立，用戶不知道下一步 → 🆕 Agentic Infra 解決
 - **沒有記憶**（Phase 1），Agent 每次從零開始，其他技能都白搭
 - **沒有觸發**（Phase 2），技能裝了也用不上
 - **沒有路由**（Phase 3），Agent 不知道什麼時候用哪個技能
