@@ -26,6 +26,23 @@ mkdir -p skills/skill-compliance && curl -sSL https://raw.githubusercontent.com/
 
 ## 🚀 執行流程
 
+### 方式一：平層內聯執行（推薦 · 零延遲）
+
+在每次回覆末尾，內聯執行機械比對：
+
+```
+回覆前：skill-router → required_skills: [A, B, C]
+回覆中：執行任務
+回覆末：
+  ① 列出本次實際調用的技能：[A, B]
+  ② 對比：required vs actual
+  ③ 輸出：✅ PASS 或 🔴 REJECT: [缺失技能]
+```
+
+### 方式二：子代理隔離（高風險任務 · 獨立驗證）
+
+當任務涉及寫入/部署/外部操作時，可選用子代理模式：
+
 ```
 主 Agent 完成任務
     │
@@ -50,7 +67,27 @@ PASS → 任務完成 ✅
 REJECT → 主 Agent 收到駁回通知 → 附缺失清單 → 強制重做
 ```
 
-## 📋 子代理 Prompt
+## 📋 內聯執行 Prompt
+
+在回覆末尾，按以下格式執行：
+
+```markdown
+🛡️ Compliance:
+  required: [skill-router, skill-compliance, ...]
+  actual:   [skill-router, skill-compliance, ...]
+  → ✅ PASS
+```
+
+如果缺失：
+
+```markdown
+🛡️ Compliance:
+  required: [skill-router, skill-compliance, ...]
+  actual:   [skill-router]
+  → 🔴 REJECT: skill-compliance 未調用，強制重做
+```
+
+**規則：純字串比對。不做判斷。全部出現=PASS，任何缺失=REJECT。**
 
 當 spawn skill-compliance 子代理時，使用以下 prompt：
 

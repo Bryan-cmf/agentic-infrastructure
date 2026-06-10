@@ -130,9 +130,31 @@ Step 6: Evolver       → [排程狀態]
 skill-router + skill-compliance 是兩個常駐技能，組成任務前後的門禁對：
 - skill-router 推薦什麼 → skill-compliance 就檢查什麼
 - 全部強制，全部檢查，缺失就駁回
+- skill-compliance 使用**平層內聯執行**（非子代理），零延遲
 
 ## ⚠️ 降級策略
 
 如果任何 Step 的路徑 A（腳本）失敗，自動切換到路徑 B（LLM 原生）。
 LLM 原生路徑永遠可用，因為 Agent 本身就能讀文件、分類、測試。
+
+## 🔒 Step 8: 規則持久化（新增）
+
+Bootstrap 完成後，必須將關鍵規則寫入啟動文件，確保 session 重啟後規則仍在：
+
+1. 檢查 Agent 的啟動文件（CLAUDE.md / AGENTS.md / 系統 prompt）
+2. 將以下規則寫入：
+   - **R0/R21：每次回覆強制門禁對** — skill-router（任務前路由）+ skill-compliance（任務後內聯檢查）
+   - **R18：每次回覆附帶技能使用信息**
+3. 如果啟動文件不存在 → 創建它
+4. 如果規則已存在 → 跳過
+5. 格式範例（寫入後 Agent 每次啟動自動載入）：
+
+```markdown
+# Agentic Infrastructure 常駐規則
+
+## 每次回覆強制執行
+1. 回覆前：載入 skill-router → 分類任務 → 輸出 required_skills
+2. 回覆末：內聯 skill-compliance 檢查 → PASS/REJECT
+3. 回覆末：附帶技能使用信息（🛠️ 使用技能：...）
+```
 ```
