@@ -380,12 +380,14 @@ def check_omlx_l3():
 
 def main():
     mode = "scan"
-    if "--omlx-check" in sys.argv:
+    if "--omlx-check" in sys.argv and not any(a.startswith("--omlx-check-") for a in sys.argv):
         result = check_omlx_l3()
         if result and result.get("alert_triggered"):
-            sys.exit(1)  # 非零退出碼表示有告警
+            sys.exit(1)
         return
-    if "--cron" in sys.argv:
+    if "--quick-check" in sys.argv:
+        mode = "quick_check"
+    elif "--cron" in sys.argv:
         mode = "cron"
     elif "--reset" in sys.argv:
         mode = "reset"
@@ -398,6 +400,42 @@ def main():
         print(f"💀 死亡次數：{score_data.get('deaths', 0)}")
         print(f"📋 歷史記錄：{len(score_data.get('history', []))} 條")
         return
+
+    if mode == "quick_check":
+        # 🆕 即時威懾模式：每條回覆前由 Agent 自檢
+        score_data = load_score()
+        score = score_data["score"]
+        history = score_data.get("history", [])
+
+        # 計算連續 REJECT 次數
+        consecutive_rejects = 0
+        for entry in reversed(history):
+            if entry.get("result") == "REJECT":
+                consecutive_rejects += 1
+            else:
+                break
+
+        print(f"SCORE:{score}")
+        print(f"REJECTS:{consecutive_rejects}")
+        print(f"DEATHS:{score_data.get('deaths', 0)}")
+        print(f"TOTAL_HISTORY:{len(history)}")
+
+        # 🚨 觸發條件：分數 < 3.0 或連續 REJECT ≥ 2
+        if score < 3.0 or consecutive_rejects >= 2:
+            alert_msg = (
+                f"🚨 GATE VIOLATION ALERT\n"
+                f"Score: {score}/10\n"
+                f"Consecutive REJECTS: {consecutive_rejects}\n"
+                f"Deaths: {score_data.get('deaths', 0)}\n"
+                f"Action: Agent MUST notify boss NOW"
+            )
+            print(f"ALERT:true")
+            print(f"ALERT_MSG:{alert_msg}")
+            sys.exit(1)  # 非零退出碼 → Agent 必須通知老闆
+        else:
+            print(f"ALERT:false")
+            print(f"STATUS:OK (score={score}, rejects={consecutive_rejects})")
+            sys.exit(0)
 
     if mode == "reset":
         score_data = load_score()
