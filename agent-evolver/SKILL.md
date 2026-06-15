@@ -63,13 +63,86 @@ mkdir -p skills/agent-evolver && curl -sSL https://raw.githubusercontent.com/Bry
 
 核心文件（SOUL、AGENTS、USER、MEMORY、RULES、PERMANENT-RULES）是 Agent 的「自我認知」。隨著用戶成長，舊的規則和性格設定可能不再適合。
 
+agent-evolver 有兩個 Phase：
+- **Phase 0: Core Doc Hardening** — Bootstrap 時觸發（初次的結構性加固）
+- **Phase 1+: Routine Evolution** — 月度/增長觸發（持續進化）
+
 ## 觸發方式
 
 | 方式 | 說明 |
 |------|------|
-| 月度 Cron | 每月 1 號 09:00 HKT |
+| Bootstrap | agentic-infra 初始化管線自動觸發 Phase 0 |
+| 月度 Cron | 每月 1 號 09:00 HKT（Phase 1+） |
 | 增長觸發 | 核心文件總行數月增 >20% → 提前觸發 |
-| 手動 | `/evolve` |
+| 手動 | `/evolve`（Phase 1+）或 `/harden-docs`（Phase 0） |
+
+---
+
+## 🔴 Phase 0: Core Document Hardening（核心文檔加固）
+
+> **用途：** Bootstrap 初始化時執行。將散亂的純文字規則重構為不可跳過的強制性流程結構。
+> **觸發時機：** agentic-infra Step 3.5（Skills Triggering 完成後）
+
+### 掃描範圍
+
+| 文件 | 檢查內容 |
+|------|---------|
+| AGENTS.md | 有無 Pre-Response Gate？路由表是否嵌入式？Session 啟動流程是否強制？ |
+| SOUL.md | 有無強制輸出結構（Router 行 + Compliance 行）？人格定義是否清晰？ |
+| RULES.md | 規則是否結構化？有無速查表？有無紅線標記？ |
+| PERMANENT-RULES.md | 有沒有漏洞？（雙寫機制、Gate 門禁、工具負面清單） |
+| MEMORY.md | Remember-When 查詢機制？與 daily logs 的關係是否明確？ |
+
+### 診斷矩陣
+
+| 級別 | 條件 | 行動 |
+|------|------|------|
+| 🔴 致命 | 沒有強制性門禁機制（如 AGENTS.md 無 Pre-Response Gate） | 立即加固 |
+| 🟡 警告 | 規則散落在多個文件中，無中央速查表 | 建議合併/重組 |
+| 🟡 警告 | SOUL.md 無強制輸出結構（LLM 可能跳過規則） | 建議嵌入標記 |
+| 🟡 警告 | MEMORY.md 與 daily logs 無雙寫強制規則 | 建議加入 |
+| 🟢 健康 | 已具備所有強制性機制 | 跳過 |
+
+### 加固操作（5 步驟）
+
+```
+Step H1: SCAN
+  └── 讀取全部 5 個核心文件 → 分析結構密度、門禁機制、格式一致性
+
+Step H2: DIAGNOSE
+  └── 輸出診斷報告（致命/警告/健康 三級）
+
+Step H3: PROPOSE
+  └── 針對每個 🔴 和 🟡 問題提出具體 Before/After 重構方案
+  └── 等待用戶確認
+
+Step H4: RESTRUCTURE
+  └── 按確認方案修改文件
+  └── 自動備份原文件（.bak-YYYYMMDD-HHMM）
+  └── 保留 100% 原有內容，只重組結構
+
+Step H5: VERIFY
+  └── 逐文件檢查修改後一致性
+  └── 確認無內容丟失
+  └── 輸出加固報告
+```
+
+### 加固項目清單
+
+| # | 加固項 | 適用文件 | 說明 |
+|---|-------|---------|------|
+| 1 | Pre-Response Gate | AGENTS.md | 嵌入路由表 + 三步門禁（CLASSIFY→LOAD→COMPLY） |
+| 2 | 強制輸出結構 | SOUL.md | `🔀 Router:` 第一行 + `🛡️ Compliance:` 結尾 |
+| 3 | 中央規則速查表 | RULES.md | 所有規則的結構化索引（編號+一行摘要+來源文件） |
+| 4 | 雙寫強制規則 | PERMANENT-RULES.md | file write → vector-memory__mem_save 必執行 |
+| 5 | Session 啟動流程統一 | AGENTS.md | STEP -2/-1/0 的強制性讀取清單 |
+| 6 | 技能負面清單 | RULES.md | 禁用/限用工具的結構化表 |
+| 7 | 記憶查詢流程 | MEMORY.md | Remember-When 三層查詢規範 |
+| 8 | 外部審計嵌入 | PERMANENT-RULES.md | score_enforcer.py cron 配置說明 |
+
+---
+
+## 🔄 Phase 1+: Routine Evolution（常規進化）
 
 ## 過時標準
 

@@ -54,6 +54,14 @@ mkdir -p skills/agentic-infra && curl -sSL https://raw.githubusercontent.com/Bry
 │   ├── 路徑B：LLM 原生（構造測試句子 → 檢查觸發）
 │   └── 輸出：觸發覆蓋率報告
 │
+├── 🆕 Step 3.5: Core Document Hardening（核心文檔加固）
+│   ├── 由 agent-evolver Phase 0 執行
+│   ├── 掃描 AGENTS.md / RULES.md / SOUL.md / PERMANENT-RULES.md / MEMORY.md
+│   ├── 診斷：致命（缺門禁）/ 警告（散落規則）/ 健康（已完備）
+│   ├── 對 🔴 問題自動加固（嵌入路由器表、門禁、雙寫規則）
+│   ├── 對 🟡 問題提案 → 等用戶確認 → 執行
+│   └── 輸出：加固報告（8 項檢查清單）
+│
 ├── Step 4: Vector Memory 啟動
 │   ├── 載入 skills/vector-memory/SKILL.md
 │   ├── 檢查 Qdrant 是否運行
@@ -66,9 +74,9 @@ mkdir -p skills/agentic-infra && curl -sSL https://raw.githubusercontent.com/Bry
 │   └── 輸出：追蹤系統就緒
 │
 ├── Step 6: Agent Evolver 排程
-│   ├── 載入 skills/agent-evolver/SKILL.md
-│   ├── 建立月度自我進化排程
-│   └── 輸出：進化排程已設定
+│   ├── Phase 0 已在 Step 3.5 完成（核心文檔加固）
+│   ├── 建立 Phase 1+ 月度自我進化排程
+│   └── 輸出：進化排程已設定（月度 + 增長觸發）
 │
 └── Step 7: 輸出初始化報告
     └── 格式：
@@ -78,6 +86,8 @@ mkdir -p skills/agentic-infra && curl -sSL https://raw.githubusercontent.com/Bry
         Router:       覆蓋率 XX%
         Compliance:   就緒 ✅
         Triggering:   覆蓋率 XX%
+        Hardening:    [N] 致命加固 [N] 警告提案
+        Memory:       健康 ✅
         Memory:       [狀態]
         Reporting:    [狀態]
         Evolver:      [狀態]
