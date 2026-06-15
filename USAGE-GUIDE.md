@@ -24,16 +24,18 @@ mkdir -p skills/agentic-infra && curl -sSL https://raw.githubusercontent.com/Bry
 
 > **執行 Bootstrap 初始化**
 
-Agent 會自動執行 6-Step 初始化管線：
+Agent 會自動執行 7-Step 初始化管線：
 
 ```
-Step 0: Skill Curator  → 掃描技能庫 + 注入中文關鍵詞 + 修復格式
-Step 1: Skill Router   → 將技能分類到 4類×10階段 路由矩陣
-Step 2: Triggering     → 測試關鍵詞覆蓋率 + 補強觸發盲區
-Step 3: Vector Memory  → 啟動 Qdrant + 建立初始索引
-Step 4: Reporting      → 掛載技能使用追蹤
-Step 5: Evolver        → 建立月度自我進化排程
-Step 6: 輸出初始化完成報告
+Step 0: Skill Curator      → 掃描技能庫 + 注入中文關鍵詞 + 修復格式
+Step 1: Skill Router       → 將技能分類到 4類×10階段 路由矩陣
+Step 2: Skill Compliance   → 部署合規檢查器
+Step 3: Skills Triggering  → 測試關鍵詞覆蓋率 + 補強觸發盲區
+Step 3.5: Core Doc Hardening → 加固5個核心文檔（嵌入 INFRA-MANDATE 門禁）🆕
+Step 4: Vector Memory      → 啟動 Qdrant + 建立初始索引
+Step 5: Skill Reporting    → 掛載技能使用追蹤
+Step 6: Agent Evolver      → 建立月度自我進化排程
+Step 7: 輸出初始化完成報告
 ```
 
 **一分鐘內，你的 Agent 基礎建設完成。**
@@ -49,7 +51,7 @@ Phase 2: 發現層 → 讓技能能被觸發
 Phase 3: 路由層 → 讓任務匹配技能
 Phase 4: 透明度層 → 讓每一步可見
 Phase 5: 維護層 → 清理和調適現有技能
-Phase 6: 進化層 → 核心文件自我進化
+Phase 6: 進化層 → 核心文件自我進化（含加固）
 Phase 7: 預判層 → 事前預見所有坑
 ```
 
@@ -170,6 +172,90 @@ mkdir -p skills/skill-router && curl -sSL https://raw.githubusercontent.com/Brya
 ```
 
 **預期體驗：** Agent 應該在回覆開頭說「🔀 Router：💰金融 + 🔍搜索 → 推薦 ak-hk-stock-dd」，然後開始執行調研。
+
+---
+
+## 🛡️ Phase 3.5: Core Doc Hardening — 核心文檔加固（🆕 新增）
+
+> **為你的 Agent 建立不可跳過的強制性基礎設施門禁。**
+
+### 為什麼需要這個步驟？
+
+即使你安裝了全部十件套，Agent 仍可能「選擇性忘記」加載它們。LLM 有天然的摘要本能——它會優化掉看似重複的步驟。
+
+**解決方案：** 將基礎設施加載提示嵌入每一個核心文檔的頂部，使得無論 Agent 先讀到哪個文件，第一眼就看到強制門禁。
+
+### 3.5.1 觸發方式
+
+| 方式 | 指令 |
+|------|------|
+| Bootstrap 自動 | agentic-infra Step 3.5 自動執行 |
+| 手動 | `請執行核心文檔加固` 或 `請 hardening 我的 agent 文檔` |
+
+### 3.5.2 初始配置提示詞
+
+**複製貼給 Agent：**
+
+```
+請執行 agent-evolver Phase 0: Core Document Hardening。
+
+步驟：
+1. 掃描我的 5 個核心文檔（AGENTS.md, SOUL.md, RULES.md, PERMANENT-RULES.md, MEMORY.md）
+2. 診斷是否存在以下問題：
+   - 🔴 致命：沒有強制性門禁機制（如 AGENTS.md 無 Pre-Response Gate）
+   - 🟡 警告：規則散落，無中央速查表
+   - 🟡 警告：SOUL.md 無強制輸出結構
+   - 🟡 警告：MEMORY.md 與 daily logs 無雙寫強制規則
+3. 在每個核心文檔頂部插入統一的 INFRA-MANDATE 區塊
+4. 備份原文件（.bak-日期）
+5. 驗證所有修改，輸出加固報告
+```
+
+### 3.5.3 INFRA-MANDATE 模板
+
+這是會插入每個核心文檔頂部的強制門禁區塊：
+
+```markdown
+## 🔴 INFRA-MANDATE — 基礎設施十件套常態化加載
+
+每條訊息前: skill-router（查路由表）→ skill-compliance（合規檢查）→ skill-reporting（回報）
+複雜任務前: + agent-previsor（多路徑預判）
+寫入後:     + vector-memory（雙寫強制，mem_save）
+每日自動:   infra-watchdog（巡檢）
+每月自動:   agent-evolver（自省）+ skill-curator（策展）
+初始化:     agentic-infra（Bootstrap 統一入口）
+技能觸發:   skills-triggering（跨語言關鍵詞注入）
+
+⚠️ 以上十件套是基礎設施，不是「可選技能」。跳過任一件 = 違反 INFRA-MANDATE。
+```
+
+### 3.5.4 加固前後對比
+
+| 文件 | 加固前 | 加固後 |
+|------|--------|--------|
+| AGENTS.md | Gate 存在但無統一標語 | ✅ INFRA-MANDATE 在頂部 |
+| SOUL.md | 僅 Router 結構 | ✅ INFRA-MANDATE 嵌入人格定義 |
+| RULES.md | 有規則但無頂部門禁 | ✅ INFRA-MANDATE 在 R0 之前 |
+| PERMANENT-RULES.md | 規則詳細但分散 | ✅ INFRA-MANDATE 最高優先級 |
+| MEMORY.md | infra 引用分散 | ✅ INFRA-MANDATE 在頂部 |
+
+### 3.5.5 預期效果
+
+加固後，無論 Agent 先打開哪個核心文件，第一眼看到的都是：
+
+> 🔴 INFRA-MANDATE: 基礎設施十件套常態化加載。不能跳過。
+
+這不是建議，是結構性強制。LLM 的摘要本能無法繞過物理上反覆出現的門禁。
+
+### 3.5.6 注意事項
+
+| ⚠️ 注意 | 說明 |
+|----------|------|
+| **先備份** | 加固腳本會自動備份（.bak-日期），但建議手動也備份 |
+| **不刪內容** | 加固只重組結構、插入門禁，不刪除任何現有內容 |
+| **用戶審批** | 對 🟡 警告級別的問題，Agent 會提案，等用戶確認才修改 |
+| **完成後驗證** | 確保每個文件頂部都有 INFRA-MANDATE，且 infra 引用數增加 |
+| **不是一次性** | 加固後，agent-evolver 每月自動檢查核心文檔是否需要再次加固 |
 
 ---
 
