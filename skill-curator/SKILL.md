@@ -1,6 +1,6 @@
 ---
 name: skill-curator
-description: 技能策展 技能管理 技能調適 技能掃描 技能診斷 技能維護 關鍵詞注入 多語言技能 Skill curator — full lifecycle skill management: scan, diagnose, adapt, test, and report.
+description: "技能策展 技能管理 技能調適 技能掃描 技能診斷 技能維護 關鍵詞注入 多語言技能 Skill curator — full lifecycle skill management: scan, diagnose, adapt, test, and report."
 ---
 
 # 🎨 Skill Curator — 技能全生命週期策展人
