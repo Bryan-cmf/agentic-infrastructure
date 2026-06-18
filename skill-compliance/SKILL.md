@@ -1,6 +1,6 @@
 ---
 name: skill-compliance
-description: 技能合規檢查 駁回機制 技能審計 合規審查 智能體守門 扣分系統 技能分數 Compliance checker — inline behavior: compare required vs actual skills, output PASS/REJECT. Penalty system: -0.5 per REJECT, score 0 = DEATH.
+description: "技能合規檢查 駁回機制 技能審計 合規審查 智能體守門 扣分系統 技能分數 Compliance checker — inline behavior: compare required vs actual skills, output PASS/REJECT. Penalty system: -0.5 per REJECT, score 0 = DEATH."
 ---
 
 # 🛡️ Skill Compliance Checker — 技能合規檢查器（含扣分系統）

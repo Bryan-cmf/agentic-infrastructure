@@ -1,3 +1,8 @@
+---
+name: vector-memory
+description: 向量記憶 語義記憶 Agent記憶 持久記憶 ベクトルメモリ エージェント記憶 벡터메모리 에이전트기억 Vector memory — persistent semantic memory for AI agents using Qdrant + BGE-m3. Solves the complete-amnesia-on-restart problem with a dual-engine architecture. Triggers on "remember this", "記住", "記憶", "上次提到", "vector memory".
+---
+
 # 🧠 Vector Memory — 向量記憶系統
 
 > **Qdrant + BGE-m3 + Local GGUF 雙引擎記憶架構**
