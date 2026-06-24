@@ -3,11 +3,6 @@
 import re, json, os
 from pathlib import Path
 
-try:
-    import yaml as _yaml
-except ImportError:
-    _yaml = None
-
 WORKSPACE = Path(os.environ.get("OPENCLAW_WORKSPACE", Path.home() / ".openclaw/workspace"))
 
 SKILLS_DIRS = [WORKSPACE / "skills", WORKSPACE / ".agents" / "skills"]
@@ -23,31 +18,15 @@ LANGUAGES = {
 
 
 def extract_frontmatter(content: str) -> dict | None:
-    """Extract YAML frontmatter from SKILL.md.
-
-    Uses PyYAML for correct multi-line value parsing (e.g. `description: |`).
-    Falls back to naive line regex only if PyYAML is unavailable.
-    Returns dict with a '_parse_error' key if YAML is genuinely malformed.
-    """
+    """Extract YAML frontmatter from SKILL.md."""
     m = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
     if not m:
         return None
-    yaml_block = m.group(1)
-    if _yaml is not None:
-        try:
-            fm = _yaml.safe_load(yaml_block)
-            if isinstance(fm, dict):
-                return fm
-            return {"_parse_error": f"YAML parsed to {type(fm).__name__}, not dict"}
-        except _yaml.YAMLError as e:
-            return {"_parse_error": str(e)}
-    # Fallback: naive single-line regex (cannot handle multi-line values)
     fm = {}
-    for line in yaml_block.split("\n"):
+    for line in m.group(1).split("\n"):
         kv = re.match(r"^(\w+):\s*(.*)", line)
         if kv:
             fm[kv.group(1)] = kv.group(2).strip()
-    fm["_fallback"] = True
     return fm
 
 
@@ -76,20 +55,6 @@ def scan_skill(skill_dir: Path) -> dict | None:
             "status": "critical",
             "issue": "NO_FRONTMATTER",
             "description_langs": [],
-        }
-
-    # Genuinely malformed YAML (only detectable with PyYAML)
-    if "_parse_error" in fm:
-        return {
-            "name": skill_dir.name,
-            "dir": skill_dir.name,
-            "path": str(skill_dir),
-            "status": "critical",
-            "issue": f"YAML_PARSE_ERROR: {fm['_parse_error'][:80]}",
-            "description_langs": [],
-            "has_name": False,
-            "has_desc": False,
-            "size": len(content),
         }
 
     desc = fm.get("description", "")

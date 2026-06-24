@@ -85,11 +85,10 @@ mkdir -p skills/skill-router && curl -sSL https://raw.githubusercontent.com/Brya
 
 #### 🏗️ 基礎設施層（透明 · 自動 · 不顯示）
 
-| 技能 | 觸發 | 說明 |
+| 組件 | 觸發 | 說明 |
 |------|------|------|
 | `skill-router` | 每任務 | 自動路由分類 |
-| `skill-compliance` | 每任務 | 自動合規檢查（只檢查專項層） |
-| `skill-reporting` | 每回覆 | 自動追蹤（footer 顯示） |
+| `infra-enforcer`（插件） | 每回合 | 程式評分 + audit + revise + block（合規/匯報已集中到此） |
 
 #### 🎯 專項技能層（強制 · 顯示 · 檢查）
 
@@ -149,8 +148,7 @@ mkdir -p skills/skill-router && curl -sSL https://raw.githubusercontent.com/Brya
 ┌─────────────────────────────────────────────┐
 │  基礎設施層（透明 · 自動運行 · 不顯示給用戶）  │
 │  skill-router      → 每次任務前自動路由       │
-│  skill-compliance  → 每次任務後自動檢查       │
-│  skill-reporting   → 每次回覆自動附追踪        │
+│  infra-enforcer    → 每次回合後程式評分+審計  │
 └─────────────────────────────────────────────┘
                     │
                     ▼
@@ -177,7 +175,7 @@ v2.0 的問題：每次輸出 [skill-router, skill-compliance, skill-reporting, 
 
 v3.0：基礎設施像操作系統一樣在後台運行。用戶只看到「這次用了 software-architect 做架構審查」。
 
-### 與 skill-compliance 的整合（v3.0）
+### 與 infra-enforcer 的整合（v3.0）
 
 ```
 skill-router → 專項強制清單（不含基礎設施）
@@ -186,10 +184,11 @@ skill-router → 專項強制清單（不含基礎設施）
     主 Agent 載入專項技能 + 執行
          │
          ▼
-skill-compliance → 只檢查專項技能是否被調用
+infra-enforcer（插件）→ 程式核對 toolCall 紀錄，評分 + 寫 audit.jsonl
 ```
 
 **基礎設施技能不在合規範圍內——它們是自動運行的，不需檢查。**
+（v2 精簡後，skill-compliance 已移除，合規由 infra-enforcer 程式負責。）
 
 ## 授權
 

@@ -1,5 +1,8 @@
 # AGENTS.md - Your Workspace
 
+> ⚠️ **v2 更新（2026-06-24）**：本文檔反映 v1 十件套結構。v2 已精簡為**七件套 + infra-enforcer 插件**：`skills-triggering`（併入 curator）、`skill-compliance` + `skill-reporting`（併入 infra-enforcer）已移除。本文檔中提及這三個技能的部分請以 [`README.md`](./README.md) 的 v2 結構為準。
+
+
 This folder is home. Treat it that way.
 
 ## 🔴 INFRA-MANDATE — 基礎設施十件套常態化加載（全文件第一行規則）
