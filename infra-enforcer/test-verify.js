@@ -257,10 +257,11 @@ console.log("\nCase J — audit 紀錄欄位完整性（watchdog 依賴的欄位
 }
 
 // ─── Case K: maintenance-turn discrimination ──────────────────────────────
-// Cron jobs (auto-memory-dream) and heartbeat turns are internal upkeep that
-// legitimately don't call Skill tools. The trigger field discriminates them.
-// This test pins the predicate so a regression (over-enforcement) is caught.
-console.log("\nCase K — 維護任務識別（cron/heartbeat 不該被強制/扣分）");
+// Enforcement applies ONLY to explicit user turns. Everything else (cron,
+// heartbeat, supervisor loops, manual test, undefined) is exempt by default —
+// this prevents ANY system/scheduled turn from draining the score, including
+// triggers we haven't enumerated. This test pins the "default-exempt" policy.
+console.log("\nCase K — 維護任務識別（僅 user turn 被強制，其餘一律豁免）");
 {
   const triggers = {
     cron: { trigger: "cron", jobId: "abc-123", workspaceDir: "/tmp/x" },
@@ -268,14 +269,16 @@ console.log("\nCase K — 維護任務識別（cron/heartbeat 不該被強制/�
     user: { trigger: "user", senderId: "ou_1", workspaceDir: "/tmp/x" },
     undefined: { workspaceDir: "/tmp/x" },
     manual: { trigger: "manual", workspaceDir: "/tmp/x" },
+    supervisor: { trigger: "supervisor", workspaceDir: "/tmp/x" },
   };
-  // Mirror the predicate from index.js exactly.
-  const isMaintenance = (ctx) => ctx?.trigger === "cron" || ctx?.trigger === "heartbeat";
-  assert("cron turn is maintenance", isMaintenance(triggers.cron) === true);
-  assert("heartbeat turn is maintenance", isMaintenance(triggers.heartbeat) === true);
-  assert("user turn is NOT maintenance", isMaintenance(triggers.user) === false);
-  assert("undefined trigger is NOT maintenance (treated as user)", isMaintenance(triggers.undefined) === false);
-  assert("manual turn is NOT maintenance", isMaintenance(triggers.manual) === false);
+  // Mirror the predicate from index.js: enforce ONLY when trigger === "user".
+  const isMaintenance = (ctx) => ctx?.trigger !== "user";
+  assert("cron turn is exempt", isMaintenance(triggers.cron) === true);
+  assert("heartbeat turn is exempt", isMaintenance(triggers.heartbeat) === true);
+  assert("user turn is enforced (NOT exempt)", isMaintenance(triggers.user) === false);
+  assert("undefined trigger is exempt (default-off)", isMaintenance(triggers.undefined) === true);
+  assert("manual turn is exempt", isMaintenance(triggers.manual) === true);
+  assert("supervisor turn is exempt (new trigger auto-covered)", isMaintenance(triggers.supervisor) === true);
 }
 
 console.log(`\n=== 結果：${pass} 通過 / ${fail} 失敗 ===\n`);

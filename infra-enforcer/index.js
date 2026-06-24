@@ -172,15 +172,19 @@ function getWorkspace(ctx) {
   return ctx?.workspaceDir || process.env.OPENCLAW_WORKSPACE;
 }
 
-// Maintenance turns (cron jobs like auto-memory-dream, heartbeat health
-// checks) are system-internal upkeep, not user tasks. They legitimately
+// Maintenance turns (cron jobs, heartbeat, supervisor loops, scheduled
+// agents) are system-internal upkeep, not user tasks. They legitimately
 // don't call Skill tools, so they must be exempt from skill enforcement —
 // otherwise they drain the score to 0 and block real user turns.
-// ctx.trigger is the first-party discriminator ("cron"|"heartbeat"|"user");
-// OpenClaw's own memory-core plugin gates on the same field.
+//
+// POLICY: enforce ONLY on explicit user-initiated turns. Anything else
+// (cron, heartbeat, manual test, undefined trigger from a non-user path)
+// is exempt by default. This is safer than enumerating every system
+// trigger — new system triggers automatically get exempted.
 function isMaintenanceTurn(ctx) {
   const t = ctx?.trigger;
-  return t === "cron" || t === "heartbeat";
+  // Only real user conversations are subject to skill enforcement.
+  return t !== "user";
 }
 
 function getScorePath(ws) {
@@ -412,6 +416,7 @@ export default definePluginEntry({
         appendAudit(scoreDir, {
           ts: new Date().toISOString(),
           runId: event?.runId ?? null,
+          trigger: ctx?.trigger ?? null,
           verdict: result.verdict,
           reason: result.reason,
           delta: result.delta,
