@@ -25,6 +25,7 @@ import {
   DELTA,
   evaluateCompliance,
 } from "./compliance.js";
+import { guardianReview } from "./guardian.js";
 
 // Re-export so existing imports keep working.
 export { evaluateCompliance, extractSkillCalls, extractRouterRecommended } from "./compliance.js";
@@ -51,6 +52,9 @@ const CONFIG = {
   notifyEnabled: process.env.INFRA_ENFORCER_NOTIFY !== "off",
   notifyDangerScore: Number(process.env.INFRA_ENFORCER_NOTIFY_DANGER_SCORE ?? 2.0),
   notifyDailyCap: Number(process.env.INFRA_ENFORCER_NOTIFY_DAILY_CAP ?? 3),
+  // Guardian semantic review (second-model check for fabrication/skipping).
+  guardianModel: process.env.INFRA_ENFORCER_GUARDIAN_MODEL || "deepseek/deepseek-v4-flash",
+  guardianTimeoutMs: Number(process.env.INFRA_ENFORCER_GUARDIAN_TIMEOUT ?? 15000),
 };
 
 // ─── Bootstrap Enforcement Context (injected into system prompt) ─────
@@ -447,31 +451,49 @@ export default definePluginEntry({
         const messages = event?.messages;
         if (!Array.isArray(messages)) return { action: "continue" };
 
-        const result = evaluateCompliance(messages);
-        // Only reject hard failures (no Skill call at all, or wrong skill).
-        // weak_pass (used a skill, no router block) is allowed through — the
-        // agent_end hook already scores it low without needing a redo.
-        if (result.verdict === "pass" || result.verdict === "weak_pass") {
+        // Stage 1: regex pre-judgment (fast, catches "no tool call at all").
+        const regexResult = evaluateCompliance(messages);
+
+        // Stage 2: Guardian semantic review (v4-flash). Runs EVERY user turn
+        // (per user's "最嚴" choice). Guardian can override the regex verdict
+        // — it catches fabrication, "called-but-ignored", wrong-fit skills
+        // that regex structurally cannot see. On any Guardian failure, falls
+        // back to the regex verdict (never breaks the main flow).
+        const finalResult = await guardianReview(api, messages, regexResult, ctx, {
+          model: CONFIG.guardianModel,
+          timeoutMs: CONFIG.guardianTimeoutMs,
+        });
+
+        // Pass / weak_pass → accept the reply.
+        if (finalResult.verdict === "pass" || finalResult.verdict === "weak_pass") {
           return { action: "continue" };
         }
 
-        // Revise: give the model a precise instruction and let the SDK bound
-        // retries via maxAttempts. Each revise pass re-runs the model; on the
-        // final attempt the harness accepts whatever it produces.
-        const calledList = result.detail?.called_skills?.length
-          ? result.detail.called_skills.join(", ")
+        // Reject → revise. Build an instruction that includes the Guardian's
+        // specific diagnosis (reason + evidence) when available, so the model
+        // gets actionable feedback instead of a generic "use a skill" nudge.
+        const calledList = finalResult.called_skills?.length
+          ? finalResult.called_skills.join(", ")
           : "（沒有任何 Skill 工具呼叫）";
+
+        const guardianDetail =
+          finalResult.source === "guardian" && finalResult.evidence
+            ? `\n\n🔍 Guardian 診斷：${finalResult.reason}\n證據：${finalResult.evidence}`
+            : "";
+
         return {
           action: "revise",
-          reason: `compliance_${result.reason}`,
+          reason: `compliance_${finalResult.reason}`,
           retry: {
             maxAttempts: CONFIG.reviseMaxAttempts,
             instruction:
-              `⚠️ [infra-enforcer] 本回合合規檢查 REJECT（${result.reason}）。` +
+              `⚠️ [infra-enforcer + Guardian] 本回合合規檢查 REJECT（${finalResult.reason}）。` +
               `已核對真實 toolCall 紀錄：本回合 ${calledList}。` +
-              `infra-enforcer 只認真實的 Skill 工具呼叫，打「🛠️」文字不算。` +
+              `（評分來源：${finalResult.source}${finalResult.fallbackReason ? `, fallback: ${finalResult.fallbackReason}` : ""}）` +
+              `infra-enforcer 只認真實的 Skill 工具呼叫，打「🛠️」文字不算；Guardian 會核對你是否真的遵循技能指引。` +
               `請重新作答：先用 Skill 工具呼叫 skill-router 分類任務，` +
-              `再用 Skill 工具呼叫路由推薦的專項技能，然後執行任務。`,
+              `再用 Skill 工具呼叫路由推薦的專項技能，然後切實遵循技能內容執行任務。` +
+              guardianDetail,
           },
         };
       },

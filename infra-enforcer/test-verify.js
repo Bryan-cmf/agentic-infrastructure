@@ -7,6 +7,7 @@
 // the score. Pure-function tests against evaluateCompliance().
 
 import { evaluateCompliance, extractSkillCalls, extractRouterRecommended } from "./compliance.js";
+import { guardianReview, parseGuardianVerdict, buildGuardianPrompt } from "./guardian.js";
 
 let pass = 0;
 let fail = 0;
@@ -279,6 +280,83 @@ console.log("\nCase K — 維護任務識別（僅 user turn 被強制，其餘�
   assert("undefined trigger is exempt (default-off)", isMaintenance(triggers.undefined) === true);
   assert("manual turn is exempt", isMaintenance(triggers.manual) === true);
   assert("supervisor turn is exempt (new trigger auto-covered)", isMaintenance(triggers.supervisor) === true);
+}
+
+// ─── Case L: Guardian verdict parser (tolerant of markdown/non-JSON) ──────
+console.log("\nCase L — Guardian verdict 解析器（容錯：純JSON/markdown包裹/壞格式）");
+{
+  const clean = parseGuardianVerdict('{"verdict":"reject","reason":"偽造","evidence":"聲稱用了但沒呼叫","confidence":0.9}');
+  assert("clean JSON parsed", clean.verdict === "reject" && clean.reason === "偽造", clean);
+
+  const wrapped = parseGuardianVerdict('```json\n{"verdict":"pass","reason":"ok","evidence":"","confidence":0.8}\n```');
+  assert("markdown-wrapped JSON parsed", wrapped.verdict === "pass", wrapped.verdict);
+
+  const prose = parseGuardianVerdict('The agent did fine. {"verdict":"weak_pass","reason":"部分遵循","evidence":"x","confidence":0.6} thanks');
+  assert("JSON embedded in prose parsed", prose.verdict === "weak_pass", prose.verdict);
+
+  const garbage = parseGuardianVerdict("this is not json at all");
+  assert("garbage → unknown + parseError", garbage.verdict === "unknown" && garbage.parseError === true, garbage);
+
+  const empty = parseGuardianVerdict("");
+  assert("empty → unknown", empty.verdict === "unknown" && empty.parseError === true, empty);
+}
+
+// ─── Case M: Guardian review with MOCK api (reject → carries evidence) ────
+console.log("\nCase M — Guardian 審查（mock api：reject 帶 evidence）");
+{
+  const mockApi = {
+    runtime: { llm: {
+      complete: async () => ({
+        text: '{"verdict":"reject","reason":"偽造遵循","evidence":"回覆聲稱套用 frontend-design 的網格，但程式碼無 grid 屬性","confidence":0.85}',
+      }),
+    } },
+  };
+  const regexResult = { verdict: "pass", reason: "used_router_recommended_skill", detail: { called_skills: ["frontend-design"], router_recommended: ["frontend-design"] } };
+  const r = await guardianReview(mockApi, [{ role: "assistant", content: [{ type: "text", text: "我用了 frontend-design" }] }], regexResult, { agentId: "main" });
+  assert("Guardian source", r.source === "guardian", r.source);
+  assert("Guardian overrode regex pass → reject", r.verdict === "reject" && r.regexVerdict === "pass", `${r.verdict}/${r.regexVerdict}`);
+  assert("evidence carried", r.evidence && r.evidence.includes("grid"), r.evidence);
+  assert("confidence carried", r.confidence === 0.85, r.confidence);
+}
+
+// ─── Case N: Guardian fallback when api lacks llm.complete ─────────────────
+console.log("\nCase N — Guardian 容錯：api 無 llm.complete → fallback 回 regex");
+{
+  const noLlmApi = { runtime: {} };
+  const regexResult = { verdict: "reject", reason: "no_skill_tool_call", detail: { called_skills: [] } };
+  const r = await guardianReview(noLlmApi, [], regexResult, {});
+  assert("falls back to regex", r.source === "regex_fallback", r.source);
+  assert("keeps regex verdict", r.verdict === "reject", r.verdict);
+  assert("records fallback reason", r.fallbackReason === "no_llm_complete_api", r.fallbackReason);
+}
+
+// ─── Case O: Guardian fallback on model error/timeout ─────────────────────
+console.log("\nCase O — Guardian 容錯：模型拋錯 → fallback 回 regex（不崩潰）");
+{
+  const throwingApi = {
+    runtime: { llm: {
+      complete: async () => { throw new Error("model timeout"); },
+    } },
+  };
+  const regexResult = { verdict: "pass", reason: "used_router_recommended_skill", detail: { called_skills: ["x"] } };
+  const r = await guardianReview(throwingApi, [], regexResult, {});
+  assert("error → fallback, not throw", r.source === "regex_fallback", r.source);
+  assert("keeps regex verdict on error", r.verdict === "pass", r.verdict);
+  assert("error message captured", r.fallbackReason && r.fallbackReason.includes("model timeout"), r.fallbackReason);
+}
+
+// ─── Case P: Guardian fallback on unparseable verdict ─────────────────────
+console.log("\nCase P — Guardian 容錯：模型回非JSON → fallback 回 regex");
+{
+  const garbageApi = {
+    runtime: { llm: {
+      complete: async () => ({ text: "I think the agent did well, no issues." }),
+    } },
+  };
+  const regexResult = { verdict: "reject", reason: "no_skill_tool_call", detail: { called_skills: [] } };
+  const r = await guardianReview(garbageApi, [], regexResult, {});
+  assert("unparseable → fallback", r.source === "regex_fallback", r.source);
+  assert("keeps regex reject", r.verdict === "reject", r.verdict);
 }
 
 console.log(`\n=== 結果：${pass} 通過 / ${fail} 失敗 ===\n`);
