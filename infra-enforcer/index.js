@@ -39,7 +39,7 @@ const CONFIG = {
   deathThreshold: Number(process.env.INFRA_ENFORCER_DEATH_THRESHOLD ?? 0),
   injectChecklist: process.env.INFRA_ENFORCER_INJECT_CHECKLIST !== "false",
   blockUncompliant: process.env.INFRA_ENFORCER_BLOCK !== "false",
-  initialScore: Number(process.env.INFRA_ENFORCER_INITIAL_SCORE ?? 5.0),
+  initialScore: Number(process.env.INFRA_ENFORCER_INITIAL_SCORE ?? 10.0),
   maxScore: 10,
   historyLimit: Number(process.env.INFRA_ENFORCER_HISTORY_LIMIT ?? 20),
   auditMaxBytes: Number(process.env.INFRA_ENFORCER_AUDIT_MAX_BYTES ?? 500_000),
@@ -161,7 +161,7 @@ ${ROUTER_TABLE}
 - 呼叫了 router 推薦的技能 → 分數 ${DELTA.matchedRouter}（PASS）
 - 呼叫了技能但不符合 router 推薦 → 分數 ${DELTA.wrongSkill}（REJECT）
 - 呼叫了技能但沒輸出 router 區塊 → 分數 ${DELTA.usedButNoRouter}（弱 PASS）
-- 累積分數 ≤ ${CONFIG.deathThreshold} → 下一次 turn 硬性 block，必須 /reset
+- 累積分數低 → 每次回覆都會被 revise 要求重做 + IM 警告（不會鎖死，但持續施壓直到改善）
 
 ## 🚫 禁止的合理化藉口
 
@@ -331,7 +331,7 @@ function notifyReject(ws, scoreBefore, scoreAfter, reason) {
     `⚠️ [infra-enforcer] 合規警告\n` +
     `分數：${scoreBefore} → ${scoreAfter}（危險區 ≤ ${CONFIG.notifyDangerScore}）\n` +
     `原因：${reason}\n` +
-    `連續失敗將導致下次 turn 被 block，需 /reset。`;
+    `連續失敗會導致每次回覆都被 revise 要求重做，直到改善為止。`;
 
   const bin = process.env.OPENCLAW_BIN || "openclaw";
   execFile(
@@ -378,29 +378,28 @@ export default definePluginEntry({
     api.on(
       "before_agent_run",
       async (_event, ctx) => {
-        if (!CONFIG.blockUncompliant) return { outcome: "pass" };
-
-        // Enforce ONLY for allowlisted agents on user-initiated turns.
-        // (external-supervisor shares agentId=main but trigger != "user".)
+        // NOTE: block gate REMOVED (2026-06-25).
+        // Previously this returned outcome:"block" when score ≤ threshold, but
+        // that created a DEADLOCK: once score hit 0, the user couldn't even
+        // send /reset (it's also a turn → blocked). No recovery path.
+        //
+        // Now: ALWAYS pass. Enforcement is done via:
+        //   - before_agent_finalize: revise (force redo) on reject — this is
+        //     more effective than block because it makes the model redo the
+        //     turn rather than locking the user out.
+        //   - before_prompt_build: injects a danger warning when score is low.
+        //
+        // We still read the score here only to emit a telemetry warning (no
+        // blocking), so operators can see "score is critical" in logs.
         if (!shouldEnforce(ctx, _event)) return { outcome: "pass" };
-
         const ws = getWorkspace(ctx);
-        if (!ws) {
-          console.warn("[infra-enforcer] no workspace resolved; skipping block gate");
-          return { outcome: "pass" };
-        }
-
-        const score = readScore(getScorePath(ws));
-        if (score <= CONFIG.deathThreshold) {
-          return {
-            outcome: "block",
-            reason: `compliance_score_${score}_below_threshold_${CONFIG.deathThreshold}`,
-            message:
-              `❌ [System Enforcement] Compliance score (${score}) hit the death threshold. ` +
-              `The previous turns did not make real Skill tool calls. ` +
-              `Please /reset the session and start with the proper infrastructure bootstrap ` +
-              `(read PRE-TASK-CHECKLIST.md → agentic-infra Bootstrap → skill-router → Skill tool).`,
-          };
+        if (ws) {
+          const score = readScore(getScorePath(ws));
+          if (score <= CONFIG.deathThreshold) {
+            console.warn(
+              `[infra-enforcer] ⚠️ compliance score critical (${score}) — revise/enforcer will apply pressure, but NOT blocking (deadlock-safe)`,
+            );
+          }
         }
         return { outcome: "pass" };
       },
