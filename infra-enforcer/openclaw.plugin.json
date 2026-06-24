@@ -1,0 +1,37 @@
+{
+  "id": "infra-enforcer",
+  "name": "Infrastructure Enforcer",
+  "description": "Forces infra bootstrap before every task, injects PRE-TASK-CHECKLIST into prompt, blocks uncompliant agent runs",
+  "activation": {
+    "onStartup": true
+  },
+  "contracts": {
+    "hooks": [
+      "before_prompt_build",
+      "before_agent_run",
+      "agent_end"
+    ]
+  },
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "bootstrap_score_path": {
+        "type": "string",
+        "default": "memory/skill-compliance/score.json"
+      },
+      "death_threshold": {
+        "type": "number",
+        "default": 0
+      },
+      "inject_checklist": {
+        "type": "boolean",
+        "default": true
+      },
+      "block_uncompliant": {
+        "type": "boolean",
+        "default": true
+      }
+    },
+    "additionalProperties": false
+  }
+}

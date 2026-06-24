@@ -1,5 +1,8 @@
 # 📋 Agentic Infrastructure — 一鍵一鍵初始化提示詞
 
+> ⚠️ **v2 更新（2026-06-24）**：本文檔反映 v1 十件套結構。v2 已精簡為**七件套 + infra-enforcer 插件**：`skills-triggering`（併入 curator）、`skill-compliance` + `skill-reporting`（併入 infra-enforcer）已移除。本文檔中提及這三個技能的部分請以 [`README.md`](./README.md) 的 v2 結構為準。
+
+
 > **每個方框都是一段提示詞。複製 → 貼給 Agent → 看結果 → 下一段。**
 >
 > **10 段跑完，你的 Agent 基礎建設就完成了。**

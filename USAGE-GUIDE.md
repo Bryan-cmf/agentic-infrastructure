@@ -1,5 +1,8 @@
 # 🚀 Agentic Infrastructure 十件套 — 完整使用指南
 
+> ⚠️ **v2 更新（2026-06-24）**：本文檔反映 v1 十件套結構。v2 已精簡為**七件套 + infra-enforcer 插件**：`skills-triggering`（併入 curator）、`skill-compliance` + `skill-reporting`（併入 infra-enforcer）已移除。本文檔中提及這三個技能的部分請以 [`README.md`](./README.md) 的 v2 結構為準。
+
+
 > **從安裝到體驗，一步步引導你與 Agent 建立深度協作。**
 
 ---

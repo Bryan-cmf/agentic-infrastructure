@@ -26,19 +26,22 @@ mkdir -p skills/infra-watchdog && curl -sSL https://raw.githubusercontent.com/Br
 
 ## 🩺 巡查清單
 
-每次巡查按以下清單逐項檢查 9 個技能：
+每次巡查按以下清單逐項檢查 7 件套 + enforcer 插件：
 
-| # | 技能 | 檢查方式 | 通過標準 | 失敗時建議 |
+| # | 組件 | 檢查方式 | 通過標準 | 失敗時建議 |
 |---|------|---------|---------|-----------|
-| ① | skills-triggering | SKILL.md 存在且 description 含中文 | 文件可讀 | 重新安裝：見 STEP-BY-STEP 前置 |
-| ② | skill-router | SKILL.md 存在 + 路由矩陣完整 | 文件可讀 + 含4類×10階段 | 重新安裝 |
-| ③ | skill-reporting | 最近回覆有技能信息 | 回覆末尾有 `🛠️ 使用技能` | 見 STEP-BY-STEP 第 5 步 |
-| ④ | vector-memory | curl localhost:6333/healthz | HTTP 200 | 見 STEP-BY-STEP 第 4 步 |
-| ⑤ | skill-curator | 技能 description 含 CJK 比例 | >80% | 見 STEP-BY-STEP 第 1 步 |
-| ⑥ | agent-evolver | 進化排程存在 | cron 或提醒已設定 | 見 STEP-BY-STEP 第 6 步 |
-| ⑦ | agent-previsor | SKILL.md 存在 | 文件可讀 | 重新安裝 |
-| ⑧ | agentic-infra | BOOTSTRAP.md 或 STEP-BY-STEP.md 存在 | 文件可讀 | 重新安裝 |
-| ⑨ | skill-compliance | 最近回覆有內聯檢查 | 回覆末尾有 PASS/REJECT | 見 STEP-BY-STEP 第 3 步 |
+| ① | skill-router | SKILL.md 存在 + 路由矩陣完整 | 文件可讀 + 含4類×10階段 | 重新安裝 |
+| ② | vector-memory | curl localhost:6333/healthz | HTTP 200 | 見 STEP-BY-STEP 第 4 步 |
+| ③ | skill-curator | 技能 description 含 CJK 比例 | >80% | 見 STEP-BY-STEP 第 1 步 |
+| ④ | agent-evolver | 進化排程存在 | cron 或提醒已設定 | 見 STEP-BY-STEP 第 6 步 |
+| ⑤ | agent-previsor | SKILL.md 存在 | 文件可讀 | 重新安裝 |
+| ⑥ | agentic-infra | BOOTSTRAP.md 或 STEP-BY-STEP.md 存在 | 文件可讀 | 重新安裝 |
+| ⑦ | infra-watchdog | 本 SKILL.md 存在 | 文件可讀 | 重新安裝 |
+| ⑧ | infra-enforcer（插件） | `memory/skill-compliance/audit.jsonl` 最近 24h 有記錄 | 有近期 verdict 記錄 | 重啟 gateway；查 enforcer 是否載入 |
+
+> v2（2026-06-24）：巡查對象從 9 項精簡為 7 件套 + enforcer。
+> skills-triggering（併入 curator 的 CJK 檢查）、skill-compliance + skill-reporting
+>（併入 enforcer 的 audit.jsonl 檢查）已移除。
 
 ---
 
@@ -47,23 +50,20 @@ mkdir -p skills/infra-watchdog && curl -sSL https://raw.githubusercontent.com/Br
 巡查完成後輸出以下格式的報告：
 
 ```
-🩺 Infra Watchdog 巡查報告
+🩺 Infra Watchdog 巡查報告（7 件套 + enforcer）
 📅 日期：YYYY-MM-DD
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
-① skills-triggering:  ✅ 正常
-② skill-router:      ✅ 正常
-③ skill-reporting:   ⚠️ 退化 — 最近 3 次回覆缺技能信息
-④ vector-memory:     ✅ 正常 (Qdrant alive, 399 pts)
-⑤ skill-curator:     🔴 需關注 — CJK 覆蓋率 53%（目標 >80%）
-⑥ agent-evolver:     ✅ 正常
-⑦ agent-previsor:    ✅ 正常
-⑧ agentic-infra:     ✅ 正常
-⑨ skill-compliance:  ⚠️ 退化 — 最近回覆缺 PASS/REJECT
+① skill-router:      ✅ 正常
+② vector-memory:     ✅ 正常 (Qdrant alive, 399 pts)
+③ skill-curator:     🔴 需關注 — CJK 覆蓋率 53%（目標 >80%）
+④ agent-evolver:     ✅ 正常
+⑤ agent-previsor:    ✅ 正常
+⑥ agentic-infra:     ✅ 正常
+⑦ infra-watchdog:    ✅ 正常
+⑧ infra-enforcer:    ✅ audit.jsonl 近 24h 有 5 筆記錄
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔧 建議修復：
-  ⑤ → 執行 STEP-BY-STEP 第 1 步（技能健康掃描）
-  ③ → 執行 STEP-BY-STEP 第 5 步（啟動技能追蹤）
-  ⑨ → 執行 STEP-BY-STEP 第 3 步（部署合規檢查器）
+  ③ → 執行 STEP-BY-STEP 第 1 步（技能健康掃描）
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
