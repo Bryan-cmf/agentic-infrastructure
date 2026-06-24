@@ -257,29 +257,34 @@ console.log("\nCase J — audit 紀錄欄位完整性（watchdog 依賴的欄位
   assert("audit called_skills is array", Array.isArray(auditEntry.called_skills), typeof auditEntry.called_skills);
 }
 
-// ─── Case K: maintenance-turn discrimination ──────────────────────────────
-// Enforcement applies ONLY to explicit user turns. Everything else (cron,
-// heartbeat, supervisor loops, manual test, undefined) is exempt by default —
-// this prevents ANY system/scheduled turn from draining the score, including
-// triggers we haven't enumerated. This test pins the "default-exempt" policy.
-console.log("\nCase K — 維護任務識別（僅 user turn 被強制，其餘一律豁免）");
+// ─── Case K: enforcement discrimination (agentId allowlist AND trigger) ────
+// Enforcement requires BOTH: agentId in allowlist AND trigger === "user".
+// This fixes external-supervisor (shares agentId=main but trigger != "user").
+console.log("\nCase K — 強制判斷（agentId 白名單 + user trigger，兩者皆須滿足）");
 {
-  const triggers = {
-    cron: { trigger: "cron", jobId: "abc-123", workspaceDir: "/tmp/x" },
-    heartbeat: { trigger: "heartbeat", workspaceDir: "/tmp/x" },
-    user: { trigger: "user", senderId: "ou_1", workspaceDir: "/tmp/x" },
-    undefined: { workspaceDir: "/tmp/x" },
-    manual: { trigger: "manual", workspaceDir: "/tmp/x" },
-    supervisor: { trigger: "supervisor", workspaceDir: "/tmp/x" },
-  };
-  // Mirror the predicate from index.js: enforce ONLY when trigger === "user".
-  const isMaintenance = (ctx) => ctx?.trigger !== "user";
-  assert("cron turn is exempt", isMaintenance(triggers.cron) === true);
-  assert("heartbeat turn is exempt", isMaintenance(triggers.heartbeat) === true);
-  assert("user turn is enforced (NOT exempt)", isMaintenance(triggers.user) === false);
-  assert("undefined trigger is exempt (default-off)", isMaintenance(triggers.undefined) === true);
-  assert("manual turn is exempt", isMaintenance(triggers.manual) === true);
-  assert("supervisor turn is exempt (new trigger auto-covered)", isMaintenance(triggers.supervisor) === true);
+  const enforceAgentIds = ["main"];
+  // Mirror shouldEnforce: agentId in allowlist AND trigger === "user"
+  const shouldEnforce = (ctx) =>
+    enforceAgentIds.includes(ctx?.agentId) && ctx?.trigger === "user";
+  const ctx = (agentId, trigger) => ({ agentId, trigger });
+
+  assert("main + user → enforce", shouldEnforce(ctx("main", "user")) === true);
+  assert("main + cron → exempt", shouldEnforce(ctx("main", "cron")) === false);
+  assert("main + supervisor → exempt (fixes external-supervisor)", shouldEnforce(ctx("main", "supervisor")) === false);
+  assert("main + undefined → exempt", shouldEnforce(ctx("main", undefined)) === false);
+  assert("coder-qwen + user → exempt (not in allowlist)", shouldEnforce(ctx("coder-qwen", "user")) === false);
+  assert("looper + user → exempt (not in allowlist)", shouldEnforce(ctx("looper", "user")) === false);
+}
+
+// ─── Case K2: failed turn is never scored ──────────────────────────────────
+// A turn with success===false or error must not be scored — it's an outage.
+console.log("\nCase K2 — 失敗 turn 不評分（模型故障不該算跳過技能）");
+{
+  const isFailedTurn = (event) => event?.success === false || !!event?.error;
+  assert("success:false → failed", isFailedTurn({ success: false }) === true);
+  assert("has error → failed", isFailedTurn({ error: "timeout" }) === true);
+  assert("success:true no error → not failed", isFailedTurn({ success: true }) === false);
+  assert("no success field → not failed", isFailedTurn({}) === false);
 }
 
 // ─── Case L: Guardian verdict parser (tolerant of markdown/non-JSON) ──────

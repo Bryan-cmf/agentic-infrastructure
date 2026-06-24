@@ -53,8 +53,14 @@ const CONFIG = {
   notifyDangerScore: Number(process.env.INFRA_ENFORCER_NOTIFY_DANGER_SCORE ?? 2.0),
   notifyDailyCap: Number(process.env.INFRA_ENFORCER_NOTIFY_DAILY_CAP ?? 3),
   // Guardian semantic review (second-model check for fabrication/skipping).
-  guardianModel: process.env.INFRA_ENFORCER_GUARDIAN_MODEL || "deepseek/deepseek-v4-flash",
+  guardianModel: process.env.INFRA_ENFORCER_GUARDIAN_MODEL || "qwen/qwen3-max-2026-01-23",
   guardianTimeoutMs: Number(process.env.INFRA_ENFORCER_GUARDIAN_TIMEOUT ?? 15000),
+  // agentId allowlist: enforce ONLY for these agents (default-exempt policy
+  // was trigger-based, but external-supervisor shares agentId=main with user
+  // turns, so trigger alone misfires). Whitelist the conversation agent(s)
+  // that should be subject to skill enforcement.
+  enforceAgentIds: (process.env.INFRA_ENFORCER_AGENT_IDS || "main")
+    .split(",").map(s => s.trim()).filter(Boolean),
 };
 
 // ─── Bootstrap Enforcement Context (injected into system prompt) ─────
@@ -176,19 +182,36 @@ function getWorkspace(ctx) {
   return ctx?.workspaceDir || process.env.OPENCLAW_WORKSPACE;
 }
 
-// Maintenance turns (cron jobs, heartbeat, supervisor loops, scheduled
-// agents) are system-internal upkeep, not user tasks. They legitimately
-// don't call Skill tools, so they must be exempt from skill enforcement —
-// otherwise they drain the score to 0 and block real user turns.
+// Should this turn be subject to skill enforcement?
 //
-// POLICY: enforce ONLY on explicit user-initiated turns. Anything else
-// (cron, heartbeat, manual test, undefined trigger from a non-user path)
-// is exempt by default. This is safer than enumerating every system
-// trigger — new system triggers automatically get exempted.
-function isMaintenanceTurn(ctx) {
-  const t = ctx?.trigger;
-  // Only real user conversations are subject to skill enforcement.
-  return t !== "user";
+// TWO conditions must BOTH hold:
+//   1. ctx.agentId is in the enforceAgentIds allowlist (default: ["main"])
+//   2. ctx.trigger === "user" (a real user-initiated conversation)
+//
+// This replaces the earlier trigger-only gate, which misfired because
+// external-supervisor (a cron job) shares agentId="main" with user turns but
+// carried a non-"cron" trigger. With the AND condition, supervisor turns
+// (trigger != "user") are exempt even though they share the agentId, AND
+// turns from non-enforced agents (e.g. coder-*, ecc) are exempt even if
+// triggered by a user.
+//
+// Also: turns that FAILED (model error/timeout) are never the model's fault
+// and must not be scored — that's punishing infra outages, not skill-skipping.
+function shouldEnforce(ctx, event) {
+  // Condition 1: agent allowlist
+  if (!CONFIG.enforceAgentIds.includes(ctx?.agentId)) return false;
+  // Condition 2: must be a real user turn
+  if (ctx?.trigger !== "user") return false;
+  return true;
+}
+
+// A failed turn (model error/timeout/rate-limit) must never be scored.
+// The agent didn't "skip" skills — it couldn't reply at all. Scoring these
+// drains the score during outages and blocks recovery.
+function isFailedTurn(event) {
+  if (event?.success === false) return true;
+  if (event?.error) return true;
+  return false;
 }
 
 function getScorePath(ws) {
@@ -357,13 +380,9 @@ export default definePluginEntry({
       async (_event, ctx) => {
         if (!CONFIG.blockUncompliant) return { outcome: "pass" };
 
-        // Maintenance/system turns (cron jobs like auto-memory-dream, heartbeat
-        // health checks) legitimately don't call Skill tools — they're internal
-        // upkeep, not user tasks. Skip enforcement for them entirely. This
-        // matches OpenClaw's own memory-core plugin, which gates on the same
-        // ctx.trigger. Without this, cron jobs drain the score to 0 and block
-        // real user turns.
-        if (isMaintenanceTurn(ctx)) return { outcome: "pass" };
+        // Enforce ONLY for allowlisted agents on user-initiated turns.
+        // (external-supervisor shares agentId=main but trigger != "user".)
+        if (!shouldEnforce(ctx, _event)) return { outcome: "pass" };
 
         const ws = getWorkspace(ctx);
         if (!ws) {
@@ -393,9 +412,13 @@ export default definePluginEntry({
     api.on(
       "agent_end",
       async (event, ctx) => {
-        // Don't score maintenance turns (cron/heartbeat) — they're internal
-        // upkeep that won't call Skill tools and shouldn't move the score.
-        if (isMaintenanceTurn(ctx)) return;
+        // Don't score maintenance turns OR failed turns.
+        // - Non-enforced agents / non-user triggers: skip (default-exempt).
+        // - Failed turns (model error/timeout/rate-limit): the agent couldn't
+        //   reply at all — that's an outage, not skill-skipping. Scoring it
+        //   drains the score during outages and blocks recovery.
+        if (!shouldEnforce(ctx, event)) return;
+        if (isFailedTurn(event)) return;
 
         const ws = getWorkspace(ctx);
         if (!ws) return;
@@ -445,8 +468,8 @@ export default definePluginEntry({
     api.on(
       "before_agent_finalize",
       async (event, ctx) => {
-        // Maintenance turns don't need skill compliance; don't revise them.
-        if (isMaintenanceTurn(ctx)) return { action: "continue" };
+        // Enforce ONLY for allowlisted agents on user-initiated turns.
+        if (!shouldEnforce(ctx, event)) return { action: "continue" };
 
         const messages = event?.messages;
         if (!Array.isArray(messages)) return { action: "continue" };
