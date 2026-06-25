@@ -25,7 +25,9 @@ import {
   DELTA,
   evaluateCompliance,
 } from "./compliance.js";
-import { guardianReview } from "./guardian.js";
+// guardian.js is retained for future use but no longer wired into a hook:
+// the v3 redesign removed before_agent_finalize (the revise loop source).
+// Guardian may be re-introduced as an async audit-only reviewer later.
 
 // Re-export so existing imports keep working.
 export { evaluateCompliance, extractSkillCalls, extractRouterRecommended } from "./compliance.js";
@@ -157,11 +159,11 @@ ${ROUTER_TABLE}
 （讀取 AssistantMessage.content 裡 type==="toolCall" && name==="Skill" 的區塊）。
 **不是**看回覆文字有沒有「🛠️」。寫這些文字不會得分。
 
-- 完全沒有 Skill 工具呼叫 → 分數 ${DELTA.noToolCall}（REJECT）+ 系統會要求你 revise 重答
-- 呼叫了 router 推薦的技能 → 分數 ${DELTA.matchedRouter}（PASS）
-- 呼叫了技能但不符合 router 推薦 → 分數 ${DELTA.wrongSkill}（REJECT）
-- 呼叫了技能但沒輸出 router 區塊 → 分數 ${DELTA.usedButNoRouter}（弱 PASS）
-- 累積分數低 → 每次回覆都會被 revise 要求重做 + IM 警告（不會鎖死，但持續施壓直到改善）
+- 完全沒有 Skill 工具呼叫 → 記為 REJECT，會通知老闆
+- 呼叫了 router 推薦的技能 → 記為 PASS
+- 呼叫了技能但不符合 router 推薦 → 記為 REJECT
+- 呼叫了技能但沒輸出 router 區塊 → 記為弱 PASS
+- 分數是健康指標（供老闆查看），不會 block 或 revise 你——但老闆會收到通知
 
 ## 🚫 禁止的合理化藉口
 
@@ -355,7 +357,7 @@ export default definePluginEntry({
   id: "infra-enforcer",
   name: "Infrastructure Enforcer",
   description:
-    "Forces infra bootstrap before every task; judges compliance by real Skill tool calls",
+    "Observes & records real Skill tool usage; never forces/blocks/revises. v3: audit.jsonl + IM notify + health score. The human responds to bad usage; the enforcer never interferes with the turn.",
 
   register(api) {
     // ─── Hook #1: before_prompt_build ────────────────────────────────
@@ -371,51 +373,23 @@ export default definePluginEntry({
       { priority: 100 },
     );
 
-    // ─── Hook #2: before_agent_run ───────────────────────────────────
-    // Block the run if compliance score has hit the death threshold.
-    // This is the ONLY hard gate. (Previously never fired due to the
-    // event.context bug — now reads ctx.workspaceDir correctly.)
-    api.on(
-      "before_agent_run",
-      async (_event, ctx) => {
-        // NOTE: block gate REMOVED (2026-06-25).
-        // Previously this returned outcome:"block" when score ≤ threshold, but
-        // that created a DEADLOCK: once score hit 0, the user couldn't even
-        // send /reset (it's also a turn → blocked). No recovery path.
-        //
-        // Now: ALWAYS pass. Enforcement is done via:
-        //   - before_agent_finalize: revise (force redo) on reject — this is
-        //     more effective than block because it makes the model redo the
-        //     turn rather than locking the user out.
-        //   - before_prompt_build: injects a danger warning when score is low.
-        //
-        // We still read the score here only to emit a telemetry warning (no
-        // blocking), so operators can see "score is critical" in logs.
-        if (!shouldEnforce(ctx, _event)) return { outcome: "pass" };
-        const ws = getWorkspace(ctx);
-        if (ws) {
-          const score = readScore(getScorePath(ws));
-          if (score <= CONFIG.deathThreshold) {
-            console.warn(
-              `[infra-enforcer] ⚠️ compliance score critical (${score}) — revise/enforcer will apply pressure, but NOT blocking (deadlock-safe)`,
-            );
-          }
-        }
-        return { outcome: "pass" };
-      },
-      { priority: 90 },
-    );
-
-    // ─── Hook #3: agent_end ──────────────────────────────────────────
-    // Inspect the REAL tool-call transcript and update the compliance score.
+    // ─── Hook #2: agent_end ──────────────────────────────────────────
+    // OBSERVE & RECORD only — never force, never block, never revise.
+    //
+    // v3 redesign (2026-06-25): the "force" philosophy (block then revise)
+    // failed twice — block deadlocked the user, revise looped the system to
+    // death. Both assumed "punishment changes model behavior", but a model
+    // that doesn't use skills just repeats the same behavior under pressure.
+    //
+    // Now agent_end is a passive observer: it reads the real tool-call
+    // transcript, writes an audit record (the tamper-proof source of truth),
+    // updates a health-score (for at-a-glance status, NOT for gating), and
+    // pushes an IM heads-up to the operator when usage looks bad. The human
+    // decides how to respond — the enforcer never interferes with the turn.
     api.on(
       "agent_end",
       async (event, ctx) => {
-        // Don't score maintenance turns OR failed turns.
-        // - Non-enforced agents / non-user triggers: skip (default-exempt).
-        // - Failed turns (model error/timeout/rate-limit): the agent couldn't
-        //   reply at all — that's an outage, not skill-skipping. Scoring it
-        //   drains the score during outages and blocks recovery.
+        // Only observe user turns of enforced agents (skip cron/heartbeat).
         if (!shouldEnforce(ctx, event)) return;
         if (isFailedTurn(event)) return;
 
@@ -427,6 +401,8 @@ export default definePluginEntry({
         const score = readScore(scorePath);
         const result = evaluateCompliance(event?.messages);
 
+        // Health score: still tracked for at-a-glance status, but it drives
+        // NOTHING automatic — no block, no revise. It's an indicator, not a gate.
         const next = Math.max(
           Math.min(score + result.delta, CONFIG.maxScore),
           0,
@@ -437,8 +413,7 @@ export default definePluginEntry({
           delta: result.delta,
           verdict: result.verdict,
         });
-        // Tamper-proof audit trail: every turn's real skill usage, written by
-        // the program (never by the model). Single source of truth for watchdog.
+        // Tamper-proof audit trail: every turn's real skill usage.
         appendAudit(scoreDir, {
           ts: new Date().toISOString(),
           runId: event?.runId ?? null,
@@ -452,72 +427,9 @@ export default definePluginEntry({
           router_recommended: result.detail?.router_recommended ?? [],
           matched: result.detail?.matched ?? [],
         });
-        // Push an IM heads-up if the score landed in the danger zone.
+        // Notify the operator (NOT the model) when usage looks bad. The human
+        // decides whether to intervene — the enforcer never touches the turn.
         notifyReject(ws, score, next, result.reason);
-      },
-      { priority: 100 },
-    );
-
-    // ─── Hook #4: before_agent_finalize ─────────────────────────────
-    // Mid-strength gate: if the reply that's about to ship has NO real Skill
-    // tool call, demand another model pass (revise) instead of accepting it.
-    // Uses the SDK's native retry cap (maxAttempts) — the harness itself stops
-    // revising after maxAttempts, so no infinite-token risk. This is the layer
-    // between "nudge via prompt" (hook #1) and "block the next turn" (hook #2).
-    api.on(
-      "before_agent_finalize",
-      async (event, ctx) => {
-        // Enforce ONLY for allowlisted agents on user-initiated turns.
-        if (!shouldEnforce(ctx, event)) return { action: "continue" };
-
-        const messages = event?.messages;
-        if (!Array.isArray(messages)) return { action: "continue" };
-
-        // Stage 1: regex pre-judgment (fast, catches "no tool call at all").
-        const regexResult = evaluateCompliance(messages);
-
-        // Stage 2: Guardian semantic review (v4-flash). Runs EVERY user turn
-        // (per user's "最嚴" choice). Guardian can override the regex verdict
-        // — it catches fabrication, "called-but-ignored", wrong-fit skills
-        // that regex structurally cannot see. On any Guardian failure, falls
-        // back to the regex verdict (never breaks the main flow).
-        const finalResult = await guardianReview(api, messages, regexResult, ctx, {
-          model: CONFIG.guardianModel,
-          timeoutMs: CONFIG.guardianTimeoutMs,
-        });
-
-        // Pass / weak_pass → accept the reply.
-        if (finalResult.verdict === "pass" || finalResult.verdict === "weak_pass") {
-          return { action: "continue" };
-        }
-
-        // Reject → revise. Build an instruction that includes the Guardian's
-        // specific diagnosis (reason + evidence) when available, so the model
-        // gets actionable feedback instead of a generic "use a skill" nudge.
-        const calledList = finalResult.called_skills?.length
-          ? finalResult.called_skills.join(", ")
-          : "（沒有任何 Skill 工具呼叫）";
-
-        const guardianDetail =
-          finalResult.source === "guardian" && finalResult.evidence
-            ? `\n\n🔍 Guardian 診斷：${finalResult.reason}\n證據：${finalResult.evidence}`
-            : "";
-
-        return {
-          action: "revise",
-          reason: `compliance_${finalResult.reason}`,
-          retry: {
-            maxAttempts: CONFIG.reviseMaxAttempts,
-            instruction:
-              `⚠️ [infra-enforcer + Guardian] 本回合合規檢查 REJECT（${finalResult.reason}）。` +
-              `已核對真實 toolCall 紀錄：本回合 ${calledList}。` +
-              `（評分來源：${finalResult.source}${finalResult.fallbackReason ? `, fallback: ${finalResult.fallbackReason}` : ""}）` +
-              `infra-enforcer 只認真實的 Skill 工具呼叫，打「🛠️」文字不算；Guardian 會核對你是否真的遵循技能指引。` +
-              `請重新作答：先用 Skill 工具呼叫 skill-router 分類任務，` +
-              `再用 Skill 工具呼叫路由推薦的專項技能，然後切實遵循技能內容執行任務。` +
-              guardianDetail,
-          },
-        };
       },
       { priority: 100 },
     );
